@@ -81,55 +81,43 @@ const applyFilters = <T extends Record<string, any>>(
   const getValue = (obj: any, path: string): any =>
     path.split(".").reduce((acc, part) => acc?.[part], obj);
 
-  return data.filter((item) => {
-    return Object.entries(filterOptions).every(([key, value]) => {
-      const itemValue = getValue(item, key);
+  const matchesFilter = (itemValue: any, filterValue: any): boolean => {
+    if (Array.isArray(itemValue)) {
+      return itemValue.some((nestedItem) =>
+        matchesFilter(nestedItem, filterValue)
+      );
+    }
 
-      if (
-        typeof value === "object" &&
-        value !== null &&
-        !value.from &&
-        !value.to
-      ) {
-        return Object.entries(value).every(([nestedKey, nestedValue]) => {
-          if (
-            typeof nestedValue !== "string" &&
-            typeof nestedValue !== "number"
-          ) {
-            return false;
-          }
-
-          const nestedItemValue = itemValue?.[nestedKey];
-          return (
-            nestedItemValue?.toString().toLowerCase() ===
-            nestedValue.toString().toLowerCase()
-          );
-        });
-      }
-
-      if (Array.isArray(value)) {
-        return value.includes(itemValue?.toString());
-      }
-
-      if (value && (value.from || value.to)) {
+    if (typeof filterValue === "object" && filterValue !== null) {
+      if (filterValue.from || filterValue.to) {
         const itemDate = new Date(itemValue);
-        if (value.from && value.to) {
-          return itemDate >= value.from && itemDate <= value.to;
-        } else if (value.from) {
-          return itemDate >= value.from;
-        } else if (value.to) {
-          return itemDate <= value.to;
+        if (filterValue.from && filterValue.to) {
+          return itemDate >= filterValue.from && itemDate <= filterValue.to;
+        } else if (filterValue.from) {
+          return itemDate >= filterValue.from;
+        } else if (filterValue.to) {
+          return itemDate <= filterValue.to;
         }
       }
 
-      if (typeof value === "object" && value.is) {
-        return itemValue?.toString() === value.is.toString();
-      }
+      return Object.entries(filterValue).every(([nestedKey, nestedValue]) => {
+        if (nestedKey === "is") {
+          return itemValue?.toString() === (nestedValue as string).toString();
+        }
+        return matchesFilter(itemValue?.[nestedKey], nestedValue);
+      });
+    }
 
-      return itemValue
-        ?.toString()
-        .toLowerCase()
-        .includes(value.toString().toLowerCase());
+    return itemValue
+      ?.toString()
+      .toLowerCase()
+      .includes(filterValue.toString().toLowerCase());
+  };
+
+  return data.filter((item) => {
+    return Object.entries(filterOptions).every(([key, value]) => {
+      const itemValue = getValue(item, key);
+      return matchesFilter(itemValue, value);
     });
   });
 };

@@ -1,4 +1,9 @@
 import { FastifyReply, FastifyRequest } from "fastify";
+import {
+  FilterOptions,
+  PaginationOptions,
+  SortingOptions,
+} from "../../utils/data.util";
 import { EditCategoryInput, NewCategoryInput } from "./new-category.schema";
 import {
   createNewCategory,
@@ -7,7 +12,7 @@ import {
   getNewCategoriesByLanguage,
   getNewCategoryById,
   getNewCategoryByIdAndLanguage,
-  updateNewCategory
+  updateNewCategory,
 } from "./new-category.service";
 
 export async function createNewCategoryHandler(
@@ -30,12 +35,14 @@ export async function createNewCategoryHandler(
 }
 
 export async function getAllNewCategoriesHandler(
-  request: FastifyRequest,
+  request: FastifyRequest<{
+    Querystring: PaginationOptions & SortingOptions & FilterOptions;
+  }>,
   reply: FastifyReply
 ) {
   try {
-    const categories = await getAllNewCategories();
-    return reply.send(categories);
+    const { totalCount, data } = await getAllNewCategories(request.query);
+    return reply.send({ totalCount, data });
   } catch (error) {
     reply.status(500).send({ error: "Failed to fetch categories" });
   }

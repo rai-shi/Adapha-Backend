@@ -27,17 +27,26 @@ export const getNewCategoriesByLanguageResponseSchema = z.array(
   })
 );
 
-export const getAllNewCategoriesResponseSchema = z.array(
-  z.object({
-    id: z.number(),
-    translations: z.array(
-      NewCategoryTranslationSchema.extend({
-        id: z.number(),
-        categoryId: z.number(),
-      })
-    ),
+export const getAllNewCategoriesResponseSchema = z
+  .object({
+    totalCount: z.number().describe("Total number of contacts"),
+    data: z
+      .array(
+        z.object({
+          id: z.number(),
+          translations: z.array(
+            NewCategoryTranslationSchema.extend({
+              id: z.number(),
+              categoryId: z.number(),
+            })
+          ),
+        })
+      )
+      .describe("List of new categories"),
   })
-);
+  .openapi({
+    description: "Get all new categories response",
+  });
 
 export const getNewCategoryByIdResponseSchema = z.object({
   id: z.number(),
@@ -56,7 +65,9 @@ export const getNewCategoryByIdAndLanguageResponseSchema = z.object({
 
 export const editNewCategorySchema = z.object({
   id: z.number(),
-  translations: z.array(NewCategoryTranslationSchema.extend({ id: z.number().optional() })),
+  translations: z.array(
+    NewCategoryTranslationSchema.extend({ id: z.number().optional() })
+  ),
 });
 
 export type EditCategoryInput = z.infer<typeof editNewCategorySchema>;

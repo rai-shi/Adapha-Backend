@@ -1,3 +1,9 @@
+import {
+  FilterOptions,
+  manageData,
+  PaginationOptions,
+  SortingOptions,
+} from "../../utils/data.util";
 import { db } from "../../utils/prisma";
 import { EditCategoryInput, NewCategoryInput } from "./new-category.schema";
 
@@ -18,14 +24,23 @@ export async function createNewCategory(data: NewCategoryInput) {
   }
 }
 
-export async function getAllNewCategories() {
+export async function getAllNewCategories(
+  query: PaginationOptions & SortingOptions & FilterOptions
+) {
   try {
     const categories = await db.newCategory.findMany({
       include: {
         translations: true,
       },
     });
-    return categories;
+
+    const { totalCount, data: paginatedContacts } = manageData(
+      categories,
+      query,
+      true
+    );
+
+    return { totalCount, data: paginatedContacts };
   } catch (error) {
     throw new Error("Failed to fetch new categories");
   }
