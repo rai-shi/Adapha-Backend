@@ -14,7 +14,12 @@ import {
 import { ZodOpenApiVersion } from "zod-openapi";
 import "zod-openapi/extend";
 import contactRoutes from "./modules/contact/contact.route";
-import { englishNewCategoryRoutes, newCategoryRoutes, turkishNewCategoryRoutes } from "./modules/new-category/new-category.route";
+import {
+  englishNewCategoryRoutes,
+  newCategoryRoutes,
+  turkishNewCategoryRoutes,
+} from "./modules/new-category/new-category.route";
+import { englishNewRoutes, newRoutes, turkishNewRoutes } from "./modules/new/new.route";
 import uploadRoutes from "./modules/upload/upload.route";
 import userRoutes from "./modules/user/user.route";
 
@@ -146,8 +151,16 @@ export function buildServer() {
   server.register(contactRoutes, { prefix: "api/contacts" });
 
   server.register(newCategoryRoutes, { prefix: "api/new-categories" });
-  server.register(englishNewCategoryRoutes, { prefix: "api/en/new-categories" });
-  server.register(turkishNewCategoryRoutes, { prefix: "api/tr/new-categories" });
+  server.register(englishNewCategoryRoutes, {
+    prefix: "api/en/new-categories",
+  });
+  server.register(turkishNewCategoryRoutes, {
+    prefix: "api/tr/new-categories",
+  });
+
+  server.register(newRoutes, { prefix: "api/news" });
+  server.register(englishNewRoutes, { prefix: "api/en/news" });
+  server.register(turkishNewRoutes, { prefix: "api/tr/news" });
 
   return server;
 }

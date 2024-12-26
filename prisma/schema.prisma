@@ -63,6 +63,7 @@ model NewTranslation {
   id          Int    @id @default(autoincrement())
   language    String
   title       String
+  slug        String  @unique
   description String
   content     String
   newId       Int
