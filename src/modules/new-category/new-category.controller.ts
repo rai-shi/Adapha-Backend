@@ -49,14 +49,20 @@ export async function getAllNewCategoriesHandler(
 }
 
 export async function getNewCategoriesByLanguageHandler(
-  request: FastifyRequest<{ Params: { language: "en" | "tr" } }>,
+  request: FastifyRequest<{
+    Params: { language: "en" | "tr" };
+    Querystring: PaginationOptions & SortingOptions & FilterOptions;
+  }>,
   reply: FastifyReply
 ) {
   const { language } = request.params;
 
   try {
-    const categories = await getNewCategoriesByLanguage(language);
-    return reply.send(categories);
+    const { totalCount, data } = await getNewCategoriesByLanguage(
+      language,
+      request.query
+    );
+    return reply.send({ totalCount, data });
   } catch (error) {
     reply
       .status(500)

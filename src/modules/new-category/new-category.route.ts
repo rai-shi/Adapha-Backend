@@ -1,6 +1,11 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { FastifyZodOpenApiTypeProvider } from "fastify-zod-openapi";
 import {
+  FilterOptions,
+  PaginationOptions,
+  SortingOptions,
+} from "../../utils/data.util";
+import {
   createNewCategoryHandler,
   deleteNewCategoryHandler,
   getAllNewCategoriesHandler,
@@ -99,7 +104,13 @@ export async function englishNewCategoryRoutes(server: FastifyInstance) {
         },
       },
     },
-    async (request, reply) => {
+    async (
+      request: FastifyRequest<{
+        Params: { language: "en" | "tr" };
+        Querystring: PaginationOptions & SortingOptions & FilterOptions;
+      }>,
+      reply
+    ) => {
       const req = { ...request, params: { language: "en" as "en" | "tr" } };
       return getNewCategoriesByLanguageHandler(req, reply);
     }
@@ -141,7 +152,13 @@ export async function turkishNewCategoryRoutes(server: FastifyInstance) {
         },
       },
     },
-    async (request, reply) => {
+    async (
+      request: FastifyRequest<{
+        Params: { language: "en" | "tr" };
+        Querystring: PaginationOptions & SortingOptions & FilterOptions;
+      }>,
+      reply
+    ) => {
       const req = { ...request, params: { language: "tr" as "en" | "tr" } };
       return getNewCategoriesByLanguageHandler(req, reply);
     }

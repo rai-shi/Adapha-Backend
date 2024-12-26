@@ -20,12 +20,15 @@ export const createNewCategoryResponseSchema = z.object({
   translations: z.array(NewCategoryTranslationSchema),
 });
 
-export const getNewCategoriesByLanguageResponseSchema = z.array(
-  z.object({
-    id: z.number(),
-    title: z.string(),
-  })
-);
+export const getNewCategoriesByLanguageResponseSchema = z.object({
+  totalCount: z.number(),
+  data: z.array(
+    z.object({
+      id: z.number(),
+      title: z.string(),
+    })
+  ),
+});
 
 export const getAllNewCategoriesResponseSchema = z
   .object({

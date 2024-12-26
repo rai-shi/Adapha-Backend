@@ -46,7 +46,10 @@ export async function getAllNewCategories(
   }
 }
 
-export async function getNewCategoriesByLanguage(language: "en" | "tr") {
+export async function getNewCategoriesByLanguage(
+  language: "en" | "tr",
+  query: PaginationOptions & SortingOptions & FilterOptions
+) {
   try {
     const categories = await db.newCategory.findMany({
       where: {
@@ -60,10 +63,19 @@ export async function getNewCategoriesByLanguage(language: "en" | "tr") {
         },
       },
     });
-    return categories.map((category) => ({
+
+    const dataResult = categories.map((category) => ({
       id: category.id,
       title: category.translations[0].title,
     }));
+
+    const { totalCount, data: paginatedCategories } = manageData(
+      dataResult,
+      query,
+      true
+    );
+
+    return { totalCount, data: paginatedCategories };
   } catch (error) {
     throw new Error("Failed to fetch new categories");
   }
