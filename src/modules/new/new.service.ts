@@ -55,6 +55,11 @@ export async function getAllNews(
     const news = await db.new.findMany({
       include: {
         translations: true,
+        category: {
+          include: {
+            translations: true,
+          },
+        },
       },
     });
 

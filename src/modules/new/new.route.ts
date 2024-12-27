@@ -17,11 +17,10 @@ import {
 import {
   createNewResponseSchema,
   createNewSchema,
-  getAllNewsResponseSchema,
   getNewByLanguageResponseSchema,
   getNewsByIdResponseSchema,
   getNewsByLanguageSchema,
-  updateNewSchema,
+  updateNewSchema
 } from "./new.schema";
 
 export async function newRoutes(server: FastifyInstance) {
@@ -31,7 +30,7 @@ export async function newRoutes(server: FastifyInstance) {
       schema: {
         tags: ["New"],
         response: {
-          200: getAllNewsResponseSchema,
+          // 200: getAllNewsResponseSchema,
         },
       },
     },
