@@ -25,15 +25,16 @@ import {
   newRoutes,
   turkishNewRoutes,
 } from "./modules/new/new.route";
+import {
+  englishTeamRoutes,
+  teamRoutes,
+  turkishTeamRoutes
+} from "./modules/team/team.route";
 import uploadRoutes from "./modules/upload/upload.route";
 import userRoutes from "./modules/user/user.route";
-import { 
-  turkishTeamRoutes, 
-  englishTeamRoutes, 
-  teamRoutes } from "./modules/team/team.route";
 
 export function buildServer() {
-  const server = Fastify({});
+  const server = Fastify({logger: true});
 
   server.register(cors, {
     origin: ["http://localhost:5173", "http://localhost:3000"],

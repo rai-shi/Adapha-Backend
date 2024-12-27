@@ -64,7 +64,21 @@ export const newsBaseSchema = z.object({
 
 export const getAllNewsResponseSchema = z.object({
   totalCount: z.number(),
-  data: z.array(newsBaseSchema),
+  data: z.array(
+    newsBaseSchema.extend({
+      category: z.object({
+        id: z.number(),
+        translations: z.array(
+          z.object({
+            id: z.number(),
+            language: z.enum(["en", "tr"]),
+            title: z.string(),
+            categoryId: z.number(),
+          })
+        ),
+      }),
+    })
+  ),
 });
 
 export const getNewByLanguageResponseSchema = z.object({
@@ -128,9 +142,12 @@ export const updateNewSchema = z.object({
     }),
 });
 
-export type UpdateNewInput = z.infer<typeof updateNewSchema>;
-
+export const getAllFeaturedNewsResponseSchema = z.array(newsBaseSchema);
+export const getAllFeaturedNewsByLanguageResponseSchema = z.array(
+  getNewByLanguageResponseSchema
+);
 export const createNewResponseSchema = newsBaseSchema;
 export const getNewsByIdResponseSchema = newsBaseSchema;
 
+export type UpdateNewInput = z.infer<typeof updateNewSchema>;
 export type NewInput = z.infer<typeof createNewSchema>;

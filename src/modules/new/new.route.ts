@@ -8,15 +8,22 @@ import {
 import {
   createNewHandler,
   deleteNewHandler,
+  getAllFeaturedNewsByLanguageHandler,
+  getAllFeaturedNewsHandler,
   getAllNewsHandler,
+  getAllNonFeaturedNewsHandler,
   getNewByIdAndLanguageHandler,
   getNewByIdHandler,
   getNewByLanguageHandler,
+  updateFeaturedNewHandler,
   updateNewHandler,
 } from "./new.controller";
 import {
   createNewResponseSchema,
   createNewSchema,
+  getAllFeaturedNewsByLanguageResponseSchema,
+  getAllFeaturedNewsResponseSchema,
+  getAllNewsResponseSchema,
   getNewByLanguageResponseSchema,
   getNewsByIdResponseSchema,
   getNewsByLanguageSchema,
@@ -30,7 +37,7 @@ export async function newRoutes(server: FastifyInstance) {
       schema: {
         tags: ["New"],
         response: {
-          // 200: getAllNewsResponseSchema,
+          200: getAllNewsResponseSchema,
         },
       },
     },
@@ -48,6 +55,43 @@ export async function newRoutes(server: FastifyInstance) {
       },
     },
     getNewByIdHandler
+  );
+
+  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
+    "/featured",
+    {
+      schema: {
+        tags: ["New"],
+        response: {
+          200: getAllFeaturedNewsResponseSchema,
+        },
+      },
+    },
+    getAllFeaturedNewsHandler
+  );
+
+  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
+    "/non-featured",
+    {
+      schema: {
+        tags: ["New"],
+        response: {
+          200: getAllFeaturedNewsResponseSchema,
+        },
+      },
+    },
+    getAllNonFeaturedNewsHandler
+  );
+
+  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().put(
+    "/featured/:id",
+    {
+      // preHandler: [server.authenticate],
+      schema: {
+        tags: ["New"],
+      },
+    },
+    updateFeaturedNewHandler
   );
 
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().post(
@@ -137,6 +181,30 @@ export async function englishNewRoutes(server: FastifyInstance) {
       return getNewByIdAndLanguageHandler(req, reply);
     }
   );
+
+  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
+    "/featured",
+    {
+      schema: {
+        tags: ["New"],
+        response: {
+          200: getAllFeaturedNewsByLanguageResponseSchema,
+        },
+      },
+    },
+    async (
+      request: FastifyRequest<{
+        Params: { language: "en" | "tr" };
+      }>,
+      reply
+    ) => {
+      const req = {
+        ...request,
+        params: { ...request.params, language: "en" as "en" | "tr" },
+      };
+      return getAllFeaturedNewsByLanguageHandler(req, reply);
+    }
+  );
 }
 
 export async function turkishNewRoutes(server: FastifyInstance) {
@@ -183,6 +251,30 @@ export async function turkishNewRoutes(server: FastifyInstance) {
         params: { ...request.params, language: "tr" as "en" | "tr" },
       };
       return getNewByIdAndLanguageHandler(req, reply);
+    }
+  );
+
+  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
+    "/featured",
+    {
+      schema: {
+        tags: ["New"],
+        response: {
+          200: getAllFeaturedNewsByLanguageResponseSchema,
+        },
+      },
+    },
+    async (
+      request: FastifyRequest<{
+        Params: { language: "en" | "tr" };
+      }>,
+      reply
+    ) => {
+      const req = {
+        ...request,
+        params: { ...request.params, language: "tr" as "en" | "tr" },
+      };
+      return getAllFeaturedNewsByLanguageHandler(req, reply);
     }
   );
 }

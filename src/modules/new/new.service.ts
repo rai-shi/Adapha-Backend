@@ -72,6 +72,86 @@ export async function getAllNews(
   }
 }
 
+export async function getAllFeaturedNews() {
+  try {
+    const news = await db.new.findMany({
+      where: { featured: true },
+      include: {
+        translations: true,
+        category: {
+          include: {
+            translations: true,
+          },
+        },
+      },
+    });
+
+    return news;
+  } catch (error) {
+    throw new Error("Failed to fetch featured news");
+  }
+}
+
+export async function getAllNonFeaturedNews() {
+  try {
+    const news = await db.new.findMany({
+      where: { featured: false },
+      include: {
+        translations: true,
+        category: {
+          include: {
+            translations: true,
+          },
+        },
+      },
+    });
+
+    return news;
+  } catch (error) {
+    throw new Error("Failed to fetch non featured news");
+  }
+}
+
+export async function getAllFeaturedNewsByLanguage(language: "en" | "tr") {
+  try {
+    const news = await db.new.findMany({
+      where: { featured: true },
+      include: {
+        translations: {
+          where: { language },
+        },
+        category: {
+          include: {
+            translations: {
+              where: { language },
+            },
+          },
+        },
+      },
+    });
+
+    const dataResult = news.map((news) => {
+      const { translations, category, ...rest } = news;
+
+      const result = {
+        ...rest,
+        language: translations[0].language,
+        title: translations[0].title,
+        content: translations[0].content,
+        description: translations[0].description,
+        slug: translations[0].slug,
+        categoryName: category?.translations[0]?.title,
+      };
+
+      return result;
+    });
+
+    return dataResult;
+  } catch (error) {
+    throw new Error("Failed to fetch featured news");
+  }
+}
+
 export async function getNewById(id: number) {
   try {
     const newRecord = await db.new.findUnique({
@@ -281,5 +361,26 @@ export async function updateNew(id: number, data: UpdateNewInput) {
     }
 
     throw new Error("Failed to update new record");
+  }
+}
+
+export async function updateFeaturedNew(id: number) {
+  try {
+    const currentNew = await db.new.findUnique({
+      where: { id },
+    });
+
+    const newUpdated = await db.new.update({
+      where: { id },
+      data: { featured: !currentNew?.featured },
+    });
+
+    return newUpdated;
+  } catch (error) {
+    if ((error as { code: string }).code === "P2025") {
+      throw new Error("NOT_FOUND");
+    }
+
+    throw new Error("Failed to update new");
   }
 }

@@ -8,10 +8,14 @@ import { NewInput, UpdateNewInput } from "./new.schema";
 import {
   createNew,
   deleteNew,
+  getAllFeaturedNews,
+  getAllFeaturedNewsByLanguage,
   getAllNews,
   getAllNewsByLangauge,
+  getAllNonFeaturedNews,
   getNewById,
   getNewByIdAndLanguage,
+  updateFeaturedNew,
   updateNew,
 } from "./new.service";
 
@@ -56,6 +60,54 @@ export async function getAllNewsHandler(
       message: "Internal Server Error",
       error: error,
     });
+  }
+}
+
+export async function getAllFeaturedNewsHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
+  try {
+    const news = await getAllFeaturedNews();
+    return reply.send(news);
+  } catch (error) {
+    return reply.status(500).send({
+      message: "Internal Server Error",
+      error: error,
+    });
+  }
+}
+
+export async function getAllNonFeaturedNewsHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
+  try {
+    const news = await getAllNonFeaturedNews();
+    return reply.send(news);
+  } catch (error) {
+    return reply.status(500).send({
+      message: "Internal Server Error",
+      error: error,
+    });
+  }
+}
+
+export async function getAllFeaturedNewsByLanguageHandler(
+  request: FastifyRequest<{
+    Params: { language: "en" | "tr" };
+  }>,
+  reply: FastifyReply
+) {
+  const { language } = request.params;
+
+  try {
+    const data = await getAllFeaturedNewsByLanguage(language);
+    return reply.send(data);
+  } catch (error) {
+    reply
+      .status(500)
+      .send({ error: `Failed to fetch featured news for ${language}` });
   }
 }
 
@@ -182,6 +234,32 @@ export async function updateNewHandler(
     return reply.status(500).send({
       message: "Failed to update new record",
       error: err.message,
+    });
+  }
+}
+
+export async function updateFeaturedNewHandler(
+  request: FastifyRequest<{
+    Params: {
+      id: string;
+    };
+  }>,
+  reply: FastifyReply
+) {
+  const id = Number(request.params.id);
+  try {
+    await updateFeaturedNew(id);
+    return reply.send("New updated successfully");
+  } catch (error) {
+    const err = error as { message: string };
+
+    if (err.message === "NOT_FOUND") {
+      return reply.status(404).send({ message: "New not found" });
+    }
+
+    return reply.status(500).send({
+      message: "Internal Server Error",
+      error: error,
     });
   }
 }
