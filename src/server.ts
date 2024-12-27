@@ -27,6 +27,10 @@ import {
 } from "./modules/new/new.route";
 import uploadRoutes from "./modules/upload/upload.route";
 import userRoutes from "./modules/user/user.route";
+import { 
+  turkishTeamRoutes, 
+  englishTeamRoutes, 
+  teamRoutes } from "./modules/team/team.route";
 
 export function buildServer() {
   const server = Fastify({});
@@ -195,6 +199,10 @@ export function buildServer() {
   server.register(newRoutes, { prefix: "api/news" });
   server.register(englishNewRoutes, { prefix: "api/en/news" });
   server.register(turkishNewRoutes, { prefix: "api/tr/news" });
+
+  server.register(teamRoutes, { prefix: "api/team" });
+  server.register(englishTeamRoutes, { prefix: "api/en/team" });
+  server.register(turkishTeamRoutes, { prefix: "api/tr/team" });
 
   return server;
 }
