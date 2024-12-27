@@ -1,6 +1,7 @@
 import fCookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import fjwt from "@fastify/jwt";
+import fastifyMultipart from "@fastify/multipart";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
@@ -19,7 +20,11 @@ import {
   newCategoryRoutes,
   turkishNewCategoryRoutes,
 } from "./modules/new-category/new-category.route";
-import { englishNewRoutes, newRoutes, turkishNewRoutes } from "./modules/new/new.route";
+import {
+  englishNewRoutes,
+  newRoutes,
+  turkishNewRoutes,
+} from "./modules/new/new.route";
 import uploadRoutes from "./modules/upload/upload.route";
 import userRoutes from "./modules/user/user.route";
 
@@ -31,6 +36,35 @@ export function buildServer() {
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
+  });
+
+  const onFile = async (part: any) => {
+    if (part.filename === "") return;
+
+    if (part.fields[part.fieldname].length !== undefined)
+      part.value = {
+        filename: part.filename,
+        mimetype: part.mimetype,
+        encoding: part.encoding,
+        value: await part.toBuffer(),
+      };
+    else
+      part.value = [
+        {
+          filename: part.filename,
+          mimetype: part.mimetype,
+          encoding: part.encoding,
+          value: await part.toBuffer(),
+        },
+      ];
+  };
+
+  server.register(fastifyMultipart, {
+    attachFieldsToBody: "keyValues",
+    onFile,
+    limits: {
+      fileSize: 4 * 1024 * 1024,
+    },
   });
 
   server.register(fastifyZodOpenApiPlugin);
