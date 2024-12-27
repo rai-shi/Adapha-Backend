@@ -22,9 +22,10 @@ import {
  } from "./team.schema";
 
 
+ // teamRoutes APIs
 export async function teamRoutes(server: FastifyInstance){
 
-    // create team member
+    // create team member (POST)
     server.withTypeProvider<FastifyZodOpenApiTypeProvider>().post(
         "/create",
         {
@@ -40,7 +41,7 @@ export async function teamRoutes(server: FastifyInstance){
         createNewTeamMemberHandler
     );
 
-    // get team member with an ID
+    // get team member with an ID (GET)
     server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
         "/:id", 
         {
@@ -54,7 +55,7 @@ export async function teamRoutes(server: FastifyInstance){
         getTeamMemberByIdHandler
     );
 
-    // get all team members as a list
+    // get all team members as a list (GET)
     server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
         "/", 
         {
@@ -68,7 +69,7 @@ export async function teamRoutes(server: FastifyInstance){
         getAllTeamMembersHandler
     );
 
-    // update team member
+    // update team member (PUT)
     server.withTypeProvider<FastifyZodOpenApiTypeProvider>().put(
         "/:id",
         {
@@ -84,7 +85,7 @@ export async function teamRoutes(server: FastifyInstance){
         updateTeamMemberHandler
     )
 
-    // delete team member
+    // delete team member (DELETE)
     server.withTypeProvider<FastifyZodOpenApiTypeProvider>().delete(
         "/:id",
         {
