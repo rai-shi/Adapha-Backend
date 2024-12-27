@@ -8,7 +8,7 @@ import {
   import { 
     getAllTeamMembersHandler,
     getTeamMemberByIdHandler,
-    createNewTeamMemberHandler,
+    createTeamMemberHandler,
     updateTeamMemberHandler,
     deleteTeamMemberHandler,
  } from "./team.controller";
@@ -22,7 +22,7 @@ import {
  } from "./team.schema";
 
 
- // teamRoutes APIs
+ // teamRoutes API routes
 export async function teamRoutes(server: FastifyInstance){
 
     // create team member (POST)
@@ -38,7 +38,7 @@ export async function teamRoutes(server: FastifyInstance){
                 }
             },
         },
-        createNewTeamMemberHandler
+        createTeamMemberHandler
     );
 
     // get team member with an ID (GET)

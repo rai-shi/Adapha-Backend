@@ -111,7 +111,7 @@ model TeamMember {
 model TeamMemberTranslation {
   id            Int    @id @default(autoincrement())
   language      String
-  title         String
+  title         String?   // optional
   role          String
   teamMemberId  Int 
   teamMember    TeamMember @relation(fields: [teamMemberId], references: [id])
