@@ -196,5 +196,9 @@ export function buildServer() {
   server.register(englishNewRoutes, { prefix: "api/en/news" });
   server.register(turkishNewRoutes, { prefix: "api/tr/news" });
 
+
+  // server.register(englishTeamRoutes, { prefix: "api/en/team" });
+  // server.register(turkishTeamRoutes, { prefix: "api/tr/team" });
+
   return server;
 }
