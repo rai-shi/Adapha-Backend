@@ -12,6 +12,7 @@ import {
   getNewByIdAndLanguageHandler,
   getNewByIdHandler,
   getNewByLanguageHandler,
+  updateNewHandler,
 } from "./new.controller";
 import {
   createNewResponseSchema,
@@ -20,6 +21,7 @@ import {
   getNewByLanguageResponseSchema,
   getNewsByIdResponseSchema,
   getNewsByLanguageSchema,
+  updateNewSchema,
 } from "./new.schema";
 
 export async function newRoutes(server: FastifyInstance) {
@@ -70,12 +72,23 @@ export async function newRoutes(server: FastifyInstance) {
       //   preHandler: [server.authenticate],
       schema: {
         tags: ["New"],
-        response: {
-          // 204: createNewResponseSchema,
-        },
       },
     },
     deleteNewHandler
+  );
+
+  server.put(
+    "/:id",
+    {
+      schema: {
+        tags: ["New"],
+        body: updateNewSchema,
+        response: {
+          200: createNewResponseSchema,
+        },
+      },
+    },
+    updateNewHandler
   );
 }
 

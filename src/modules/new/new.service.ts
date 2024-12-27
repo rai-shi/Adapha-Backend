@@ -5,7 +5,7 @@ import {
   SortingOptions,
 } from "../../utils/data.util";
 import { db } from "../../utils/prisma";
-import { NewInput } from "./new.schema";
+import { NewInput, UpdateNewInput } from "./new.schema";
 
 export async function createNew(data: NewInput) {
   try {
@@ -199,5 +199,82 @@ export async function deleteNew(id: number) {
     }
 
     throw new Error("Failed to delete new");
+  }
+}
+
+export async function updateNew(id: number, data: UpdateNewInput) {
+  try {
+    const { translations, ...rest } = data;
+
+    const existingNew = await db.new.findUnique({
+      where: { id },
+    });
+
+    if (!existingNew) {
+      throw new Error("NOT_FOUND");
+    }
+
+    const categoryExists = await db.newCategory.findUnique({
+      where: { id: data.categoryId },
+    });
+
+    if (!categoryExists) {
+      throw new Error(`CATEGORY_NOT_FOUND`);
+    }
+
+    const existingTranslations = await db.newTranslation.findMany({
+      where: { newId: id },
+    });
+
+    for (const translation of existingTranslations) {
+      const translationExists = translations.find(
+        (t) => t.id === translation.id
+      );
+
+      if (!translationExists) {
+        await db.newTranslation.delete({
+          where: { id: translation.id },
+        });
+      }
+    }
+
+    for (const translation of translations) {
+      if (translation.id) {
+        await db.newTranslation.update({
+          where: { id: translation.id },
+          data: translation,
+        });
+      } else {
+        await db.newTranslation.create({
+          data: {
+            ...translation,
+            newId: id,
+          },
+        });
+      }
+    }
+
+    const updatedNew = await db.new.update({
+      where: { id },
+      data: {
+        ...rest,
+      },
+      include: {
+        translations: true,
+      },
+    });
+
+    return updatedNew;
+  } catch (error) {
+    const err = error as { message: string };
+    if (err.message === "NOT_FOUND") {
+      throw new Error("NOT_FOUND");
+    }
+
+    if (err.message === "CATEGORY_NOT_FOUND") {
+      throw new Error("CATEGORY_NOT_FOUND");
+    }
+
+    throw new Error("Failed to update new record");
   }
 }

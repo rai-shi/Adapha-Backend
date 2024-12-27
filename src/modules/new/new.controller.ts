@@ -4,7 +4,7 @@ import {
   PaginationOptions,
   SortingOptions,
 } from "../../utils/data.util";
-import { NewInput } from "./new.schema";
+import { NewInput, UpdateNewInput } from "./new.schema";
 import {
   createNew,
   deleteNew,
@@ -12,6 +12,7 @@ import {
   getAllNewsByLangauge,
   getNewById,
   getNewByIdAndLanguage,
+  updateNew,
 } from "./new.service";
 
 export async function createNewHandler(
@@ -147,6 +148,40 @@ export async function deleteNewHandler(
     return reply.status(500).send({
       message: "Internal Server Error",
       error: error,
+    });
+  }
+}
+
+export async function updateNewHandler(
+  request: FastifyRequest<{
+    Params: { id: string };
+    Body: UpdateNewInput;
+  }>,
+  reply: FastifyReply
+) {
+  const { id } = request.params;
+  const body = request.body;
+
+  try {
+    const updatedNew = await updateNew(Number(id), body);
+    return reply.status(200).send(updatedNew);
+  } catch (error) {
+    const err = error as { message: string };
+    if (err.message === "NOT_FOUND") {
+      return reply.status(404).send({
+        message: "New not found",
+      });
+    }
+
+    if (err.message === "CATEGORY_NOT_FOUND") {
+      return reply.status(404).send({
+        message: "Category not found",
+      });
+    }
+
+    return reply.status(500).send({
+      message: "Failed to update new record",
+      error: err.message,
     });
   }
 }

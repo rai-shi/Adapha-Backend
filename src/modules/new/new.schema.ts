@@ -47,7 +47,7 @@ export const createNewSchema = z.object({
     }),
 });
 
-export const NewsBaseSchema = z.object({
+export const newsBaseSchema = z.object({
   id: z.number(),
   categoryId: z.number(),
   image: z.string(),
@@ -64,7 +64,7 @@ export const NewsBaseSchema = z.object({
 
 export const getAllNewsResponseSchema = z.object({
   totalCount: z.number(),
-  data: z.array(NewsBaseSchema),
+  data: z.array(newsBaseSchema),
 });
 
 export const getNewByLanguageResponseSchema = z.object({
@@ -87,7 +87,50 @@ export const getNewsByLanguageSchema = z.object({
   data: z.array(getNewByLanguageResponseSchema),
 });
 
-export const createNewResponseSchema = NewsBaseSchema;
-export const getNewsByIdResponseSchema = NewsBaseSchema;
+export const updateNewSchema = z.object({
+  id: z.number().min(1, "ID is required"),
+  categoryId: z.number().min(1, "Category is required"),
+  image: z.string().min(1, "Image is required"),
+  featured: z.boolean().optional(),
+  author: z.string().min(1, "Author is required"),
+  translations: z
+    .array(
+      NewTranslationSchema.extend({
+        id: z.number().optional(),
+      })
+    )
+    .refine(
+      (translations) => {
+        const languages = translations.map((t) => t.language);
+        return languages.includes("en") && languages.includes("tr");
+      },
+      {
+        message: "Both 'tr' and 'en' translations are required",
+      }
+    )
+    .openapi({
+      example: [
+        {
+          language: "tr",
+          title: "Türkçe Başlık",
+          slug: "turkce-baslik",
+          description: "Türkçe Açıklama",
+          content: "Türkçe İçerik",
+        },
+        {
+          language: "en",
+          title: "English Title",
+          slug: "english-title",
+          description: "English Description",
+          content: "English Content",
+        },
+      ],
+    }),
+});
+
+export type UpdateNewInput = z.infer<typeof updateNewSchema>;
+
+export const createNewResponseSchema = newsBaseSchema;
+export const getNewsByIdResponseSchema = newsBaseSchema;
 
 export type NewInput = z.infer<typeof createNewSchema>;
