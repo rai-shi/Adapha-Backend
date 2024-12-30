@@ -1,31 +1,31 @@
 import { FastifyInstance } from "fastify";
 import { FastifyZodOpenApiTypeProvider } from "fastify-zod-openapi";
 import {
-  createContactHandler,
-  deleteContactHandler,
-  getContactByIdHandler,
-  getContactsHandler,
-} from "./contact.controller";
+  createAwardHandler,
+  deleteAwardHandler,
+  getAwardByIdHandler,
+  getAwardsHandler,
+} from "./award.controller";
 import {
-  contactResponseSchema,
-  contactSchema,
-  contactsResponseSchema,
+  awardResponseSchema,
+  awardSchema,
+  awardsResponseSchema,
   paramsSchema,
-} from "./contact.schema";
+} from "./award.schema";
 
-export default async function contactRoutes(server: FastifyInstance) {
+export default async function awardRoutes(server: FastifyInstance) {
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
     "/",
     {
       preHandler: [server.authenticate],
       schema: {
-        tags: ["Contact"],
+        tags: ["Award"],
         response: {
-          200: contactsResponseSchema,
+          200: awardsResponseSchema,
         },
       },
     },
-    getContactsHandler
+    getAwardsHandler
   );
 
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
@@ -33,28 +33,28 @@ export default async function contactRoutes(server: FastifyInstance) {
     {
       preHandler: [server.authenticate],
       schema: {
-        tags: ["Contact"],
+        tags: ["Award"],
         params: paramsSchema,
         response: {
-          200: contactResponseSchema,
+          200: awardResponseSchema,
         },
       },
     },
-    getContactByIdHandler
+    getAwardByIdHandler
   );
 
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().post(
     "/create",
     {
       schema: {
-        tags: ["Contact"],
-        body: contactSchema,
+        tags: ["Award"],
+        body: awardSchema,
         response: {
-          201: contactResponseSchema,
+          201: awardResponseSchema,
         },
       },
     },
-    createContactHandler
+    createAwardHandler
   );
 
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().delete(
@@ -62,10 +62,10 @@ export default async function contactRoutes(server: FastifyInstance) {
     {
       preHandler: [server.authenticate],
       schema: {
-        tags: ["Contact"],
+        tags: ["Award"],
         params: paramsSchema,
       },
     },
-    deleteContactHandler
+    deleteAwardHandler
   );
 }

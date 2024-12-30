@@ -4,25 +4,25 @@ import {
   PaginationOptions,
   SortingOptions,
 } from "../../utils/data.util";
-import { ContactInput } from "./contact.schema";
+import { AwardInput } from "./award.schema";
 import {
-  createContact,
-  deleteContact,
-  getContactById,
-  getContacts,
-} from "./contact.service";
+  createAward,
+  deleteAward,
+  getAwardById,
+  getAwards,
+} from "./award.service";
 
-export async function createContactHandler(
+export async function createAwardHandler(
   request: FastifyRequest<{
-    Body: ContactInput;
+    Body: AwardInput;
   }>,
   reply: FastifyReply
 ) {
   const body = request.body;
 
   try {
-    const newContact = await createContact(body);
-    return reply.status(201).send(newContact);
+    const newAward = await createAward(body);
+    return reply.status(201).send(newAward);
   } catch (error) {
     return reply.status(500).send({
       message: "Internal Server Error",
@@ -31,14 +31,14 @@ export async function createContactHandler(
   }
 }
 
-export async function getContactsHandler(
+export async function getAwardsHandler(
   request: FastifyRequest<{
     Querystring: PaginationOptions & SortingOptions & FilterOptions;
   }>,
   reply: FastifyReply
 ) {
   try {
-    const { totalCount, data } = await getContacts(request.query);
+    const { totalCount, data } = await getAwards(request.query);
 
     return reply.send({ totalCount, data });
   } catch (error) {
@@ -49,7 +49,7 @@ export async function getContactsHandler(
   }
 }
 
-export async function getContactByIdHandler(
+export async function getAwardByIdHandler(
   request: FastifyRequest<{
     Params: {
       id: string;
@@ -60,11 +60,11 @@ export async function getContactByIdHandler(
   const id = Number(request.params.id);
 
   try {
-    const contact = await getContactById(id);
-    if (!contact) {
-      return reply.status(404).send({ message: "Contact not found" });
+    const award = await getAwardById(id);
+    if (!award) {
+      return reply.status(404).send({ message: "Award not found" });
     }
-    return reply.send(contact);
+    return reply.send(award);
   } catch (error) {
     return reply.status(500).send({
       message: "Internal Server Error",
@@ -73,7 +73,7 @@ export async function getContactByIdHandler(
   }
 }
 
-export async function deleteContactHandler(
+export async function deleteAwardHandler(
   request: FastifyRequest<{
     Params: {
       id: string;
@@ -84,13 +84,13 @@ export async function deleteContactHandler(
   const id = Number(request.params.id);
 
   try {
-    await deleteContact(id);
-    return reply.send({ message: "Contact deleted successfully" });
+    await deleteAward(id);
+    return reply.send({ message: "Award deleted successfully" });
   } catch (error) {
     const err = error as Error;
 
     if (err.message === "NOT_FOUND") {
-      return reply.status(404).send({ message: "Contact not found" });
+      return reply.status(404).send({ message: "Award not found" });
     }
 
     return reply.status(500).send({
