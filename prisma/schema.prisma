@@ -63,6 +63,7 @@ model NewTranslation {
   id          Int    @id @default(autoincrement())
   language    String
   title       String
+  slug        String  @unique
   description String
   content     String
   newId       Int
@@ -95,4 +96,25 @@ model Contact {
   email     String
   message   String
   createdAt DateTime @default(now())
+}
+
+model TeamMember {
+  id        Int     @id @default(autoincrement())
+  name      String
+  surname   String
+  image     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  translations TeamMemberTranslation[]
+}
+
+model TeamMemberTranslation {
+  id            Int    @id @default(autoincrement())
+  language      String
+  title         String?   // optional
+  role          String
+  teamMemberId  Int 
+  teamMember    TeamMember @relation(fields: [teamMemberId], references: [id])
+
+  @@unique([teamMemberId, language])
 }

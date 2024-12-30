@@ -1,6 +1,7 @@
 import fCookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import fjwt from "@fastify/jwt";
+import fastifyMultipart from "@fastify/multipart";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
@@ -14,18 +15,61 @@ import {
 import { ZodOpenApiVersion } from "zod-openapi";
 import "zod-openapi/extend";
 import contactRoutes from "./modules/contact/contact.route";
-import { englishNewCategoryRoutes, newCategoryRoutes, turkishNewCategoryRoutes } from "./modules/new-category/new-category.route";
+import {
+  englishNewCategoryRoutes,
+  newCategoryRoutes,
+  turkishNewCategoryRoutes,
+} from "./modules/new-category/new-category.route";
+import {
+  englishNewRoutes,
+  newRoutes,
+  turkishNewRoutes,
+} from "./modules/new/new.route";
+import {
+  englishTeamRoutes,
+  teamRoutes,
+  turkishTeamRoutes
+} from "./modules/team/team.route";
 import uploadRoutes from "./modules/upload/upload.route";
 import userRoutes from "./modules/user/user.route";
 
 export function buildServer() {
-  const server = Fastify({});
+  const server = Fastify({logger: true});
 
   server.register(cors, {
     origin: ["http://localhost:5173", "http://localhost:3000"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
+  });
+
+  const onFile = async (part: any) => {
+    if (part.filename === "") return;
+
+    if (part.fields[part.fieldname].length !== undefined)
+      part.value = {
+        filename: part.filename,
+        mimetype: part.mimetype,
+        encoding: part.encoding,
+        value: await part.toBuffer(),
+      };
+    else
+      part.value = [
+        {
+          filename: part.filename,
+          mimetype: part.mimetype,
+          encoding: part.encoding,
+          value: await part.toBuffer(),
+        },
+      ];
+  };
+
+  server.register(fastifyMultipart, {
+    attachFieldsToBody: "keyValues",
+    onFile,
+    limits: {
+      fileSize: 4 * 1024 * 1024,
+    },
   });
 
   server.register(fastifyZodOpenApiPlugin);
@@ -146,8 +190,20 @@ export function buildServer() {
   server.register(contactRoutes, { prefix: "api/contacts" });
 
   server.register(newCategoryRoutes, { prefix: "api/new-categories" });
-  server.register(englishNewCategoryRoutes, { prefix: "api/en/new-categories" });
-  server.register(turkishNewCategoryRoutes, { prefix: "api/tr/new-categories" });
+  server.register(englishNewCategoryRoutes, {
+    prefix: "api/en/new-categories",
+  });
+  server.register(turkishNewCategoryRoutes, {
+    prefix: "api/tr/new-categories",
+  });
+
+  server.register(newRoutes, { prefix: "api/news" });
+  server.register(englishNewRoutes, { prefix: "api/en/news" });
+  server.register(turkishNewRoutes, { prefix: "api/tr/news" });
+
+  server.register(teamRoutes, { prefix: "api/team" });
+  server.register(englishTeamRoutes, { prefix: "api/en/team" });
+  server.register(turkishTeamRoutes, { prefix: "api/tr/team" });
 
   return server;
 }

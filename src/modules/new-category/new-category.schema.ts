@@ -12,7 +12,21 @@ export const NewCategoryTranslationSchema = z.object({
 export const createNewCategorySchema = z.object({
   translations: z
     .array(NewCategoryTranslationSchema)
-    .min(1, "At least one translation is required"),
+    .refine(
+      (translations) => {
+        const languages = translations.map((t) => t.language);
+        return languages.includes("en") && languages.includes("tr");
+      },
+      {
+        message: "Both 'tr' and 'en' translations are required",
+      }
+    )
+    .openapi({
+      example: [
+        { language: "tr", title: "Türkçe Başlık" },
+        { language: "en", title: "English Title" },
+      ],
+    }),
 });
 
 export const createNewCategoryResponseSchema = z.object({
@@ -67,10 +81,24 @@ export const getNewCategoryByIdAndLanguageResponseSchema = z.object({
 });
 
 export const editNewCategorySchema = z.object({
-  id: z.number(),
-  translations: z.array(
-    NewCategoryTranslationSchema.extend({ id: z.number().optional() })
-  ),
+  // id: z.number(),
+  translations: z
+    .array(NewCategoryTranslationSchema.extend({ id: z.number().optional() }))
+    .refine(
+      (translations) => {
+        const languages = translations.map((t) => t.language);
+        return languages.includes("en") && languages.includes("tr");
+      },
+      {
+        message: "Both 'tr' and 'en' translations are required",
+      }
+    )
+    .openapi({
+      example: [
+        { language: "tr", title: "Türkçe Başlık", id: 0 },
+        { language: "en", title: "English Title", id: 0 },
+      ],
+    }),
 });
 
 export type EditCategoryInput = z.infer<typeof editNewCategorySchema>;
