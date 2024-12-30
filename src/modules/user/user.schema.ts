@@ -61,5 +61,30 @@ export const loginResponseSchema = z.object({
   email: z.string(),
 });
 
+export const changePasswordSchema = z.object({
+  oldPassword: z.string(),
+  newPassword: z
+    .string({
+      required_error: "Password is required",
+    })
+    .min(8, { message: "Password must be at least 8 characters long." })
+    .refine((password) => passwordComplexity.hasUppercase.test(password), {
+      message: "Password must contain at least one uppercase letter.",
+    })
+    .refine((password) => passwordComplexity.hasLowercase.test(password), {
+      message: "Password must contain at least one lowercase letter.",
+    })
+    .refine((password) => passwordComplexity.hasNumber.test(password), {
+      message: "Password must contain at least one number.",
+    })
+    .refine(
+      (password) => passwordComplexity.hasSpecialCharacter.test(password),
+      {
+        message: "Password must contain at least one special character.",
+      }
+    ),
+});
+
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

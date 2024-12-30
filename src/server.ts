@@ -34,7 +34,7 @@ import uploadRoutes from "./modules/upload/upload.route";
 import userRoutes from "./modules/user/user.route";
 
 export function buildServer() {
-  const server = Fastify({logger: true});
+  const server = Fastify();
 
   server.register(cors, {
     origin: ["http://localhost:5173", "http://localhost:3000"],

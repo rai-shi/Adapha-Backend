@@ -1,7 +1,16 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { verifyPassword } from "../../utils/hash";
-import { CreateUserInput, LoginInput } from "./user.schema";
-import { createUser, findUserByEmail, getUsers } from "./user.service";
+import {
+  ChangePasswordInput,
+  CreateUserInput,
+  LoginInput,
+} from "./user.schema";
+import {
+  changePassword,
+  createUser,
+  findUserByEmail,
+  getUsers,
+} from "./user.service";
 
 export async function registerUserHandler(
   request: FastifyRequest<{
@@ -137,4 +146,49 @@ export async function getUserHandler(
   const { id, email } = user;
 
   return reply.send({ id, email });
+}
+
+export async function changePasswordHandler(
+  request: FastifyRequest<{
+    Body: ChangePasswordInput;
+  }>,
+  reply: FastifyReply
+) {
+  try {
+    const user = await findUserByEmail(
+      (request.user as { email: string }).email
+    );
+
+    if (!user) {
+      return reply.status(404).send({
+        message: "User not found",
+      });
+    }
+
+    const { oldPassword, newPassword } = request.body;
+    await changePassword(user.email, oldPassword, newPassword);
+
+    logoutHandler(request, reply);
+
+    return reply.send({ message: "Password changed successfully" });
+  } catch (error) {
+    const err = error as Error;
+
+    if (err.message === "USER_NOT_FOUND") {
+      return reply.status(404).send({
+        message: "User not found",
+      });
+    }
+
+    if (err.message === "OLD_PASSWORD_INVALID") {
+      return reply.status(400).send({
+        message: "Old password is invalid",
+      });
+    }
+
+    reply.status(500).send({
+      message: "Internal Server Error",
+      error: error,
+    });
+  }
 }
