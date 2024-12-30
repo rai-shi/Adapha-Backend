@@ -1,25 +1,19 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
+import { FastifyInstance } from "fastify";
 import { FastifyZodOpenApiTypeProvider } from "fastify-zod-openapi";
 import {
-    FilterOptions,
-    PaginationOptions,
-    SortingOptions,
-  } from "../../utils/data.util";
-  import { 
+    createTeamMemberHandler,
+    deleteTeamMemberHandler,
     getAllTeamMembersHandler,
     getTeamMemberByIdHandler,
-    createTeamMemberHandler,
     updateTeamMemberHandler,
-    deleteTeamMemberHandler,
- } from "./team.controller";
-  import { 
-    getAllTeamMembersResponseSchema,
-    getTeamMemberByIdResponseSchema,
+} from "./team.controller";
+import {
     createTeamMemberResponseSchema,
     createTeamMemberSchema,
     editTeamMemberSchema,
-
- } from "./team.schema";
+    getAllTeamMembersResponseSchema,
+    getTeamMemberByIdResponseSchema,
+} from "./team.schema";
 
 
  // teamRoutes API routes
@@ -43,7 +37,7 @@ export async function teamRoutes(server: FastifyInstance){
 
     // get team member with an ID (GET)
     server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
-        "/:id", 
+        "/:id",
         {
             schema: {
                 tags: ["Team"],
@@ -57,7 +51,7 @@ export async function teamRoutes(server: FastifyInstance){
 
     // get all team members as a list (GET)
     server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
-        "/", 
+        "/",
         {
             schema: {
                 tags: ["Team"],
@@ -99,9 +93,9 @@ export async function teamRoutes(server: FastifyInstance){
 }
 
 export async function turkishTeamRoutes(server: FastifyInstance){
-    
+
 }
 
 export async function englishTeamRoutes(server: FastifyInstance){
-    
+
 }

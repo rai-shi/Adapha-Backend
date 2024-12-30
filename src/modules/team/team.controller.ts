@@ -1,65 +1,100 @@
-import fastify, { FastifyReply, FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import {
-  FilterOptions,
-  PaginationOptions,
-  SortingOptions,
+    FilterOptions,
+    PaginationOptions,
+    SortingOptions,
 } from "../../utils/data.util";
 
-import { TeamMemberInput, EditTeamMemberInput } from "./team.schema";
-import { 
-    getAllTeamMembers,
+import { TeamMemberInput } from "./team.schema";
+import {
     createTeamMember,
- } from "./team.service";
+    deleteTeamMember,
+    getAllTeamMembers,
+    getTeamMemberById,
+} from "./team.service";
 
 // import { TeamMember } from "@prisma/client";
 
-
 // get all team members
 export async function getAllTeamMembersHandler(
-    request: FastifyRequest<{
-        Querystring: PaginationOptions & SortingOptions & FilterOptions;
-      }>,
-      reply: FastifyReply
+  request: FastifyRequest<{
+    Querystring: PaginationOptions & SortingOptions & FilterOptions;
+  }>,
+  reply: FastifyReply
 ) {
-    try {
-        const { totalCount, data } = await getAllTeamMembers(request.query);
-        return reply.send({totalCount, data});
-
-    } catch (error){
-        reply.status(500).send({error: "Failed to fetch team members"});
-    }
+  try {
+    const { totalCount, data } = await getAllTeamMembers(request.query);
+    return reply.send({ totalCount, data });
+  } catch (error) {
+    reply.status(500).send({ error: "Failed to fetch team members" });
+  }
 }
 
-// get team member 
-export async function getTeamMemberByIdHandler() {
-    
+// get team member
+export async function getTeamMemberByIdHandler(
+  request: FastifyRequest<{
+    Params: { id: string };
+  }>,
+  reply: FastifyReply
+) {
+  const { id } = request.params;
+
+  try {
+    const newRecord = await getTeamMemberById(Number(id));
+    return reply.send(newRecord);
+  } catch (error) {
+    const err = error as { message: string };
+    if (err.message === "NOT_FOUND") {
+      return reply.status(404).send({ message: "Team member not found" });
+    }
+
+    return reply.status(500).send({
+      message: "Internal Server Error",
+      error: error,
+    });
+  }
 }
 
 // create new team member
 export async function createTeamMemberHandler(
-    request: FastifyRequest<{ Body: TeamMemberInput; }>,
-    reply: FastifyReply
+  request: FastifyRequest<{ Body: TeamMemberInput }>,
+  reply: FastifyReply
 ) {
-    const body = request.body;
+  const body = request.body;
 
-    try {
-        const teamMember = await createTeamMember(body);
-        return reply.status(201).send(teamMember);        
-    } catch (error) {
-        return reply.status(500).send({
-            message: "Internal Server Error",
-            error: error,
-        });
-    }   
+  try {
+    const teamMember = await createTeamMember(body);
+    return reply.status(201).send(teamMember);
+  } catch (error) {
+    return reply.status(500).send({
+      message: "Internal Server Error",
+      error: error,
+    });
+  }
 }
 
-// update team member 
-export async function updateTeamMemberHandler() {
-    
-}
+// update team member
+export async function updateTeamMemberHandler() {}
 
 // delete team member
-export async function deleteTeamMemberHandler() {
-    
-}
+export async function deleteTeamMemberHandler(
+  request: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply
+) {
+  const { id } = request.params;
 
+  try {
+    await deleteTeamMember(Number(id));
+    return reply.status(204).send({ message: "Team member deleted successfully" });
+  } catch (error) {
+    const err = error as { message: string };
+    if (err.message === "NOT_FOUND") {
+      return reply.status(404).send({ message: "Team member not found" });
+    }
+
+    return reply.status(500).send({
+      message: "Internal Server Error",
+      error: error,
+    });
+  }
+}
