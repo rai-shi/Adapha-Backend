@@ -1,17 +1,18 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import {
-    FilterOptions,
-    PaginationOptions,
-    SortingOptions,
+  FilterOptions,
+  PaginationOptions,
+  SortingOptions,
 } from "../../utils/data.util";
 
 import { EditTeamMemberInput, TeamMemberInput } from "./team.schema";
 import {
-    createTeamMember,
-    deleteTeamMember,
-    getAllTeamMembers,
-    getTeamMemberById,
-    updateTeamMember,
+  createTeamMember,
+  deleteTeamMember,
+  getAllTeamMembers,
+  getTeamMemberById,
+  getTeamMembersByLanguage,
+  updateTeamMember,
 } from "./team.service";
 
 // import { TeamMember } from "@prisma/client";
@@ -125,5 +126,27 @@ export async function deleteTeamMemberHandler(
       message: "Internal Server Error",
       error: error,
     });
+  }
+}
+
+export async function getTeamMembersByLanguageHandler(
+  request: FastifyRequest<{
+    Params: { language: "en" | "tr" };
+    Querystring: PaginationOptions & SortingOptions & FilterOptions;
+  }>,
+  reply: FastifyReply
+) {
+  const { language } = request.params;
+
+  try {
+    const { totalCount, data } = await getTeamMembersByLanguage(
+      language,
+      request.query
+    );
+    return reply.send({ totalCount, data });
+  } catch (error) {
+    reply
+      .status(500)
+      .send({ error: `Failed to fetch team members for ${language}` });
   }
 }

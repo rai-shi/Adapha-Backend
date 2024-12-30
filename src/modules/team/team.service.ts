@@ -1,8 +1,8 @@
 import {
-    FilterOptions,
-    manageData,
-    PaginationOptions,
-    SortingOptions,
+  FilterOptions,
+  manageData,
+  PaginationOptions,
+  SortingOptions,
 } from "../../utils/data.util";
 import { db } from "../../utils/prisma";
 import { EditTeamMemberInput, TeamMemberInput } from "./team.schema";
@@ -124,5 +124,44 @@ export async function updateTeamMember(id: number, data: EditTeamMemberInput) {
     }
 
     throw new Error("Failed to update team member");
+  }
+}
+
+export async function getTeamMembersByLanguage(
+  language: "en" | "tr",
+  query: PaginationOptions & SortingOptions & FilterOptions
+) {
+  try {
+    const data = await db.teamMember.findMany({
+      where: {
+        translations: {
+          some: { language },
+        },
+      },
+      include: {
+        translations: {
+          where: { language },
+        },
+      },
+    });
+
+    const dataResult = data.map((member) => ({
+      id: member.id,
+      name: member.name,
+      surname: member.surname,
+      image: member.image,
+      title: member.translations[0].title,
+      role: member.translations[0].role,
+    }));
+
+    const { totalCount, data: paginatedTeamMembers } = manageData(
+      dataResult,
+      query,
+      true
+    );
+
+    return { totalCount, data: paginatedTeamMembers };
+  } catch (error) {
+    throw new Error("Failed to fetch team members");
   }
 }

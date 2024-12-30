@@ -112,5 +112,19 @@ export const editTeamMemberSchema = z.object({
     }),
 });
 
+export const teamMembersByLanguageResponseSchema = z.object({
+  totalCount: z.number(),
+  data: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      surname: z.string(),
+      image: z.string(),
+      title: z.string(),
+      role: z.string(),
+    })
+  ),
+});
+
 export type TeamMemberInput = z.infer<typeof createTeamMemberSchema>;
 export type EditTeamMemberInput = z.infer<typeof editTeamMemberSchema>;
