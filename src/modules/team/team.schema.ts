@@ -67,14 +67,50 @@ export const getTeamMemberByIdResponseSchema = z.object({
   image: z.string(),
   translations: z.array(
     TeamMemberTranslationSchema.extend({
-        id: z.number(),
+      id: z.number(),
       title: z.string(),
       role: z.string(),
     })
   ),
 });
 
-export const editTeamMemberSchema = z.object({});
+export const editTeamMemberSchema = z.object({
+  id: z.number().min(1, "ID is required"),
+  name: z.string().min(1, "Author is required"),
+  surname: z.string().min(1, "Surname is required"),
+  image: z.string().min(1, "Image is required"),
+  translations: z
+    .array(
+      TeamMemberTranslationSchema.extend({
+        id: z.number(),
+      })
+    )
+    .refine(
+      (translations) => {
+        const languages = translations.map((t) => t.language);
+        return languages.includes("en") && languages.includes("tr");
+      },
+      {
+        message: "Both 'tr' and 'en' translations are required",
+      }
+    )
+    .openapi({
+      example: [
+        {
+          id: 0,
+          language: "tr",
+          title: "Türkçe Ünvan",
+          role: "Akademisyen",
+        },
+        {
+          id: 0,
+          language: "en",
+          title: "English Title",
+          role: "Academic",
+        },
+      ],
+    }),
+});
 
 export type TeamMemberInput = z.infer<typeof createTeamMemberSchema>;
 export type EditTeamMemberInput = z.infer<typeof editTeamMemberSchema>;

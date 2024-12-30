@@ -5,7 +5,7 @@ import {
     SortingOptions,
 } from "../../utils/data.util";
 import { db } from "../../utils/prisma";
-import { TeamMemberInput } from "./team.schema";
+import { EditTeamMemberInput, TeamMemberInput } from "./team.schema";
 
 export async function getAllTeamMembers(
   query: PaginationOptions & SortingOptions & FilterOptions
@@ -78,11 +78,51 @@ export async function deleteTeamMember(id: number) {
 
     return deletedNew;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     if ((error as { code: string }).code === "P2025") {
       throw new Error("NOT_FOUND");
     }
 
     throw new Error("Failed to delete team member");
+  }
+}
+
+export async function updateTeamMember(id: number, data: EditTeamMemberInput) {
+  try {
+    const { translations, ...rest } = data;
+
+    const existingTeamMember = await db.teamMember.findUnique({
+      where: { id },
+    });
+
+    if (!existingTeamMember) {
+      throw new Error("NOT_FOUND");
+    }
+
+    for (const translation of translations) {
+      await db.teamMemberTranslation.update({
+        where: { id: translation.id },
+        data: translation,
+      });
+    }
+
+    const updatedTeamMember = await db.teamMember.update({
+      where: { id },
+      data: {
+        ...rest,
+      },
+      include: {
+        translations: true,
+      },
+    });
+
+    return updatedTeamMember;
+  } catch (error) {
+    const err = error as { message: string };
+    if (err.message === "NOT_FOUND") {
+      throw new Error("NOT_FOUND");
+    }
+
+    throw new Error("Failed to update team member");
   }
 }

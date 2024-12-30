@@ -5,12 +5,13 @@ import {
     SortingOptions,
 } from "../../utils/data.util";
 
-import { TeamMemberInput } from "./team.schema";
+import { EditTeamMemberInput, TeamMemberInput } from "./team.schema";
 import {
     createTeamMember,
     deleteTeamMember,
     getAllTeamMembers,
     getTeamMemberById,
+    updateTeamMember,
 } from "./team.service";
 
 // import { TeamMember } from "@prisma/client";
@@ -40,8 +41,8 @@ export async function getTeamMemberByIdHandler(
   const { id } = request.params;
 
   try {
-    const newRecord = await getTeamMemberById(Number(id));
-    return reply.send(newRecord);
+    const teamRecord = await getTeamMemberById(Number(id));
+    return reply.send(teamRecord);
   } catch (error) {
     const err = error as { message: string };
     if (err.message === "NOT_FOUND") {
@@ -74,7 +75,33 @@ export async function createTeamMemberHandler(
 }
 
 // update team member
-export async function updateTeamMemberHandler() {}
+export async function updateTeamMemberHandler(
+  request: FastifyRequest<{
+    Params: { id: string };
+    Body: EditTeamMemberInput;
+  }>,
+  reply: FastifyReply
+) {
+  const { id } = request.params;
+  const body = request.body;
+
+  try {
+    const updatedTeamMember = await updateTeamMember(Number(id), body);
+    return reply.status(200).send(updatedTeamMember);
+  } catch (error) {
+    const err = error as { message: string };
+    if (err.message === "NOT_FOUND") {
+      return reply.status(404).send({
+        message: "Team member not found",
+      });
+    }
+
+    return reply.status(500).send({
+      message: "Failed to update new record",
+      error: err.message,
+    });
+  }
+}
 
 // delete team member
 export async function deleteTeamMemberHandler(
@@ -85,7 +112,9 @@ export async function deleteTeamMemberHandler(
 
   try {
     await deleteTeamMember(Number(id));
-    return reply.status(204).send({ message: "Team member deleted successfully" });
+    return reply
+      .status(204)
+      .send({ message: "Team member deleted successfully" });
   } catch (error) {
     const err = error as { message: string };
     if (err.message === "NOT_FOUND") {
