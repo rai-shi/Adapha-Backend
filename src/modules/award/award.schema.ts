@@ -14,9 +14,7 @@ export const AwardTranslationSchema = z.object({
 });
 
 export const AwardSchema = z.object({
-  image: z
-    .string()
-    .url({ message: "Image must be a valid URL" }),
+  image: z.string().min(1, "Image is required"),
   translations: z
     .array(AwardTranslationSchema)
     .refine(
@@ -30,8 +28,16 @@ export const AwardSchema = z.object({
     )
     .openapi({
       example: [
-        { language: "tr", title: "Türkçe Başlık", description: "Türkçe Açıklama" },
-        { language: "en", title: "English Title", description: "English Description" },
+        {
+          language: "tr",
+          title: "Türkçe Başlık",
+          description: "Türkçe Açıklama",
+        },
+        {
+          language: "en",
+          title: "English Title",
+          description: "English Description",
+        },
       ],
     }),
 });
@@ -50,8 +56,18 @@ export const EditAwardSchema = z.object({
     )
     .openapi({
       example: [
-        { language: "tr", title: "Türkçe Başlık", description: "Türkçe Açıklama", id: 0 },
-        { language: "en", title: "English Title", description: "English Description", id: 0 },
+        {
+          language: "tr",
+          title: "Türkçe Başlık",
+          description: "Türkçe Açıklama",
+          id: 0,
+        },
+        {
+          language: "en",
+          title: "English Title",
+          description: "English Description",
+          id: 0,
+        },
       ],
     }),
 });
@@ -84,6 +100,18 @@ export const AwardParamsSchema = z.object({
     .openapi({
       description: "The award ID",
     }),
+});
+
+export const AwardsByLanguageSchema = z.object({
+  totalCount: z.number(),
+  data: z.array(
+    z.object({
+      id: z.number(),
+      image: z.string(),
+      title: z.string(),
+      description: z.string(),
+    })
+  ),
 });
 
 export type AwardInput = z.infer<typeof AwardSchema>;

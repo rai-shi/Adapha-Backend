@@ -1,21 +1,26 @@
 // AWARD ROUTES
 
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyRequest } from "fastify";
 import { FastifyZodOpenApiTypeProvider } from "fastify-zod-openapi";
+import {
+  FilterOptions,
+  PaginationOptions,
+  SortingOptions,
+} from "../../utils/data.util";
 import {
   createAwardHandler,
   deleteAwardHandler,
   getAwardByIdHandler,
-  getAwardsHandler,
-  getAwardByIdAndLanguageHandler,
   getAwardsByLanguageHandler,
+  getAwardsHandler,
   updateAwardHandler,
 } from "./award.controller";
 import {
   AwardParamsSchema,
   AwardResponseSchema,
-  AwardsResponseSchema,
+  AwardsByLanguageSchema,
   AwardSchema,
+  AwardsResponseSchema,
   EditAwardSchema,
 } from "./award.schema";
 
@@ -89,30 +94,52 @@ export default async function awardRoutes(server: FastifyInstance) {
     },
     updateAwardHandler
   );
+}
 
+export async function turkishAwardRoutes(server: FastifyInstance) {
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
-    "/language/:language",
+    "/",
     {
       schema: {
         tags: ["Award"],
         response: {
-          200: AwardsResponseSchema,
+          200: AwardsByLanguageSchema,
         },
       },
     },
-    getAwardsByLanguageHandler
+    async (
+      request: FastifyRequest<{
+        Params: { language: "en" | "tr" };
+        Querystring: PaginationOptions & SortingOptions & FilterOptions;
+      }>,
+      reply
+    ) => {
+      const req = { ...request, params: { language: "tr" as "en" | "tr" } };
+      return getAwardsByLanguageHandler(req, reply);
+    }
   );
+}
 
+export async function englishAwardRoutes(server: FastifyInstance) {
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
-    "/:id/language/:language",
+    "/",
     {
       schema: {
         tags: ["Award"],
         response: {
-          200: AwardResponseSchema,
+          200: AwardsByLanguageSchema,
         },
       },
     },
-    getAwardByIdAndLanguageHandler
+    async (
+      request: FastifyRequest<{
+        Params: { language: "en" | "tr" };
+        Querystring: PaginationOptions & SortingOptions & FilterOptions;
+      }>,
+      reply
+    ) => {
+      const req = { ...request, params: { language: "en" as "en" | "tr" } };
+      return getAwardsByLanguageHandler(req, reply);
+    }
   );
 }

@@ -65,6 +65,7 @@ export async function getAwardsByLanguage(
 
     const dataResult = awards.map((award) => ({
       id: award.id,
+      image: award.image,
       title: award.translations[0].title,
       description: award.translations[0].description,
     }));

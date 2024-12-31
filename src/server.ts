@@ -14,6 +14,7 @@ import {
 } from "fastify-zod-openapi";
 import { ZodOpenApiVersion } from "zod-openapi";
 import "zod-openapi/extend";
+import awardRoutes, { englishAwardRoutes, turkishAwardRoutes } from "./modules/award/award.route";
 import contactRoutes from "./modules/contact/contact.route";
 import {
   englishNewCategoryRoutes,
@@ -32,7 +33,6 @@ import {
 } from "./modules/team/team.route";
 import uploadRoutes from "./modules/upload/upload.route";
 import userRoutes from "./modules/user/user.route";
-import awardRoutes from "./modules/award/award.route";
 
 export function buildServer() {
   const server = Fastify();
@@ -205,6 +205,10 @@ export function buildServer() {
   server.register(teamRoutes, { prefix: "api/team" });
   server.register(englishTeamRoutes, { prefix: "api/en/team" });
   server.register(turkishTeamRoutes, { prefix: "api/tr/team" });
+
   server.register(awardRoutes, {prefix:"api/awards"});
+  server.register(englishAwardRoutes, {prefix:"api/en/awards"});
+  server.register(turkishAwardRoutes, {prefix:"api/tr/awards"});
+
   return server;
 }
