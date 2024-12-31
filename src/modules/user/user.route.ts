@@ -1,18 +1,19 @@
 import { FastifyInstance } from "fastify";
 import { FastifyZodOpenApiTypeProvider } from "fastify-zod-openapi";
 import {
-    getUserHandler,
-    getUsersHandler,
-    loginHandler,
-    logoutHandler,
-    refreshTokenHandler,
-    registerUserHandler,
+  changePasswordHandler,
+  getUserHandler,
+  getUsersHandler,
+  loginHandler,
+  logoutHandler,
+  refreshTokenHandler,
+  registerUserHandler,
 } from "./user.controller";
 import {
-    createUserResponseSchema,
-    createUserSchema,
-    loginResponseSchema,
-    loginSchema,
+  createUserResponseSchema,
+  createUserSchema,
+  loginResponseSchema,
+  loginSchema,
 } from "./user.schema";
 
 async function userRoutes(server: FastifyInstance) {
@@ -85,6 +86,17 @@ async function userRoutes(server: FastifyInstance) {
       },
     },
     refreshTokenHandler
+  );
+
+  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().post(
+    "/change-password",
+    {
+      preHandler: [server.authenticate],
+      schema: {
+        tags: ["User"],
+      },
+    },
+    changePasswordHandler
   );
 }
 
