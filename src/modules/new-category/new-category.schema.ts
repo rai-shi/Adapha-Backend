@@ -44,8 +44,7 @@ export const getNewCategoriesByLanguageResponseSchema = z.object({
   ),
 });
 
-export const getAllNewCategoriesResponseSchema = z
-  .object({
+export const getAllNewCategoriesResponseSchema = z.object({
     totalCount: z.number().describe("Total number of contacts"),
     data: z
       .array(

@@ -1,58 +1,80 @@
+// AWARD SCHEMA
+
 import * as z from "zod";
 import "zod-openapi/extend";
 
-export const awardTranslationSchema = z.object({
+export const AwardTranslationSchema = z.object({
   language: z
-    .string({
-      required_error: "Language is required",
-      invalid_type_error: "Language must be a string",
-    })
-    .min(2, { message: "Language code must be at least 2 characters" }),
-  title: z
-    .string({
-      required_error: "Title is required",
-      invalid_type_error: "Title must be a string",
-    })
-    .min(1, { message: "Title cannot be empty" }),
-  description: z
-    .string({
-      required_error: "Description is required",
-      invalid_type_error: "Description must be a string",
-    })
-    .min(1, { message: "Description cannot be empty" }),
+    .enum(["en", "tr"])
+    .refine((value) => ["en", "tr"].includes(value), {
+      message: "Language must be one of 'en' or 'tr'",
+    }),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
 });
 
-export const awardSchema = z.object({
+export const AwardSchema = z.object({
   image: z
-    .string({
-      required_error: "Image is required",
-      invalid_type_error: "Image must be a string",
-    })
+    .string()
     .url({ message: "Image must be a valid URL" }),
   translations: z
-    .array(awardTranslationSchema)
-    .nonempty({ message: "At least one translation is required" }),
+    .array(AwardTranslationSchema)
+    .refine(
+      (translations) => {
+        const languages = translations.map((t) => t.language);
+        return languages.includes("en") && languages.includes("tr");
+      },
+      {
+        message: "Both 'tr' and 'en' translations are required",
+      }
+    )
+    .openapi({
+      example: [
+        { language: "tr", title: "Türkçe Başlık", description: "Türkçe Açıklama" },
+        { language: "en", title: "English Title", description: "English Description" },
+      ],
+    }),
 });
 
-export const awardResponseSchema = z
+export const EditAwardSchema = z.object({
+  translations: z
+    .array(AwardTranslationSchema.extend({ id: z.number().optional() }))
+    .refine(
+      (translations) => {
+        const languages = translations.map((t) => t.language);
+        return languages.includes("en") && languages.includes("tr");
+      },
+      {
+        message: "Both 'tr' and 'en' translations are required",
+      }
+    )
+    .openapi({
+      example: [
+        { language: "tr", title: "Türkçe Başlık", description: "Türkçe Açıklama", id: 0 },
+        { language: "en", title: "English Title", description: "English Description", id: 0 },
+      ],
+    }),
+});
+
+export const AwardResponseSchema = z
   .object({
     id: z.number().describe("The award ID"),
   })
-  .merge(awardSchema)
+  .merge(AwardSchema)
   .openapi({
     description: "Award Response Schema",
   });
 
-export const awardsResponseSchema = z
+export const AwardsResponseSchema = z
   .object({
     totalCount: z.number().describe("Total number of awards"),
-    data: awardResponseSchema.array().describe("List of awards"),
+    data: AwardResponseSchema.array().describe("List of awards"),
   })
   .openapi({
     description: "Awards Response Schema",
   });
 
-export const paramsSchema = z.object({
+export const AwardParamsSchema = z.object({
   id: z
     .string()
     .transform((val) => Number(val))
@@ -64,5 +86,6 @@ export const paramsSchema = z.object({
     }),
 });
 
-export type AwardInput = z.infer<typeof awardSchema>;
-export type AwardResponse = z.infer<typeof awardResponseSchema>;
+export type AwardInput = z.infer<typeof AwardSchema>;
+export type EditAwardInput = z.infer<typeof EditAwardSchema>;
+export type AwardResponse = z.infer<typeof AwardResponseSchema>;
