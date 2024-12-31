@@ -75,11 +75,37 @@ export const EditAwardSchema = z.object({
 
 export const AwardResponseSchema = z
   .object({
-    id: z.number().describe("The award ID"),
+    id: z.number(),
+    image: z.string(),
+    translations: z.array(
+      z.object({
+        id: z.number(),
+        language: z.enum(["tr", "en"]),
+        title: z.string(),
+        description: z.string(),
+      })
+    ),
   })
-  .merge(AwardSchema)
   .openapi({
     description: "Award Response Schema",
+    example: {
+      id: 1,
+      image: "https://example.com/image.png",
+      translations: [
+        {
+          id: 1,
+          language: "tr",
+          title: "Türkçe Başlık",
+          description: "Türkçe Açıklama",
+        },
+        {
+          id: 2,
+          language: "en",
+          title: "English Title",
+          description: "English Description",
+        },
+      ],
+    },
   });
 
 export const AwardsResponseSchema = z

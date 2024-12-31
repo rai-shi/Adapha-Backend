@@ -74,11 +74,37 @@ export const EditProjectSchema = z.object({
 
 export const ProjectResponseSchema = z
   .object({
-    id: z.number().describe("The project ID"),
+    id: z.number(),
+    image: z.string(),
+    translations: z.array(
+      z.object({
+        id: z.number(),
+        language: z.enum(["tr", "en"]),
+        title: z.string(),
+        description: z.string(),
+      })
+    ),
   })
-  .merge(ProjectSchema)
   .openapi({
     description: "Project Response Schema",
+    example: {
+      id: 1,
+      image: "https://example.com/image.png",
+      translations: [
+        {
+          id: 1,
+          language: "tr",
+          title: "Türkçe Başlık",
+          description: "Türkçe Açıklama",
+        },
+        {
+          id: 2,
+          language: "en",
+          title: "English Title",
+          description: "English Description",
+        },
+      ],
+    },
   });
 
 export const ProjectsResponseSchema = z
