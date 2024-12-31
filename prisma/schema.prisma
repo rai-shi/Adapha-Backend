@@ -17,6 +17,7 @@ model User {
 model Project {
   id          Int               @id @default(autoincrement())
   image       String
+  createdAt   DateTime        @default(now())
   translations ProjectTranslation[]
 }
 
@@ -34,6 +35,7 @@ model ProjectTranslation {
 model Award {
   id          Int            @id @default(autoincrement())
   image       String
+  createdAt   DateTime        @default(now())
   translations AwardTranslation[]
 }
 
@@ -113,7 +115,7 @@ model TeamMemberTranslation {
   language      String
   title         String?   // optional
   role          String
-  teamMemberId  Int 
+  teamMemberId  Int
   teamMember    TeamMember @relation(fields: [teamMemberId], references: [id])
 
   @@unique([teamMemberId, language])
