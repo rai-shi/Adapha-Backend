@@ -42,7 +42,7 @@ export const ProjectSchema = z.object({
     }),
 });
 export const EditProjectSchema = z.object({
-  image: z.string().url({ message: "Image must be a valid URL" }).optional(),
+  image: z.string().min(1, "Image is required"),
   translations: z
     .array(ProjectTranslationSchema.extend({ id: z.number().optional() }))
     .refine(

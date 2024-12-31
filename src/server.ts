@@ -26,6 +26,7 @@ import {
   newRoutes,
   turkishNewRoutes,
 } from "./modules/new/new.route";
+import projectRoutes, { englishProjectRoutes, turkishProjectRoutes } from "./modules/project/project.route";
 import {
   englishTeamRoutes,
   teamRoutes,
@@ -209,6 +210,10 @@ export function buildServer() {
   server.register(awardRoutes, {prefix:"api/awards"});
   server.register(englishAwardRoutes, {prefix:"api/en/awards"});
   server.register(turkishAwardRoutes, {prefix:"api/tr/awards"});
+
+  server.register(projectRoutes, {prefix:"api/projects"});
+  server.register(englishProjectRoutes, {prefix:"api/en/projects"});
+  server.register(turkishProjectRoutes, {prefix:"api/tr/projects"});
 
   return server;
 }

@@ -16,12 +16,12 @@ import {
   updateProjectHandler,
 } from "./project.controller";
 import {
+  EditProjectSchema,
   ProjectParamsSchema,
   ProjectResponseSchema,
   ProjectsByLanguageSchema,
   ProjectSchema,
   ProjectsResponseSchema,
-  EditProjectSchema,
 } from "./project.schema";
 
 export default async function projectRoutes(server: FastifyInstance) {
