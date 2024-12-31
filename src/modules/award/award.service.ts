@@ -38,7 +38,11 @@ export async function getAwards(
       include: { translations: true },
     });
 
-    const { totalCount, data: paginatedAwards } = manageData(awards, query, true);
+    const { totalCount, data: paginatedAwards } = manageData(
+      awards,
+      query,
+      true
+    );
     return { totalCount, data: paginatedAwards };
   } catch (error) {
     throw new Error("Failed to fetch awards");
@@ -143,7 +147,6 @@ export async function deleteAward(id: number) {
     throw new Error("Failed to delete award");
   }
 }
-
 export async function updateAward(id: number, data: EditAwardInput) {
   try {
     const existingAward = await db.award.findUnique({
@@ -153,6 +156,14 @@ export async function updateAward(id: number, data: EditAwardInput) {
 
     if (!existingAward) {
       throw new Error("NOT_FOUND");
+    }
+
+    // Resim alanını güncelleme
+    if (data.image) {
+      await db.award.update({
+        where: { id },
+        data: { image: data.image },
+      });
     }
 
     for (const translation of data.translations) {
@@ -210,6 +221,7 @@ export async function updateAward(id: number, data: EditAwardInput) {
 
     return {
       id: updatedAward.id,
+      image: updatedAward.image,
       translations: updatedAward.translations.map((translation) => ({
         language: translation.language,
         title: translation.title,

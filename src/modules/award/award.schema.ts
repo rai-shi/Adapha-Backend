@@ -41,8 +41,8 @@ export const AwardSchema = z.object({
       ],
     }),
 });
-
 export const EditAwardSchema = z.object({
+  image: z.string().url({ message: "Image must be a valid URL" }).optional(),
   translations: z
     .array(AwardTranslationSchema.extend({ id: z.number().optional() }))
     .refine(
