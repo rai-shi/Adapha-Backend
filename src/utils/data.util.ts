@@ -149,8 +149,9 @@ export function manageData<T extends Record<string, any>>(
   });
 
   const totalCount = sortedData.length;
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
+  const startIndex = (page - 1) * Number(limit);
+  const endIndex = startIndex + Number(limit);
+
   const paginatedData = sortedData.slice(startIndex, endIndex);
 
   return {
