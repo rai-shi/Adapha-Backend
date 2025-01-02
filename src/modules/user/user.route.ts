@@ -21,6 +21,7 @@ async function userRoutes(server: FastifyInstance) {
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().post(
     "/register",
     {
+      preHandler: [server.authenticate],
       schema: {
         tags: ["User"],
         body: createUserSchema,

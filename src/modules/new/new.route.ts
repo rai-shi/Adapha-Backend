@@ -27,7 +27,7 @@ import {
   getNewByLanguageResponseSchema,
   getNewsByIdResponseSchema,
   getNewsByLanguageSchema,
-  updateNewSchema
+  updateNewSchema,
 } from "./new.schema";
 
 export async function newRoutes(server: FastifyInstance) {
@@ -86,7 +86,7 @@ export async function newRoutes(server: FastifyInstance) {
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().put(
     "/featured/:id",
     {
-      // preHandler: [server.authenticate],
+      preHandler: [server.authenticate],
       schema: {
         tags: ["New"],
       },
@@ -97,7 +97,7 @@ export async function newRoutes(server: FastifyInstance) {
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().post(
     "/create",
     {
-      //   preHandler: [server.authenticate],
+      preHandler: [server.authenticate],
       schema: {
         tags: ["New"],
         body: createNewSchema,
@@ -112,7 +112,7 @@ export async function newRoutes(server: FastifyInstance) {
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().delete(
     "/:id",
     {
-      //   preHandler: [server.authenticate],
+      preHandler: [server.authenticate],
       schema: {
         tags: ["New"],
       },
@@ -120,9 +120,10 @@ export async function newRoutes(server: FastifyInstance) {
     deleteNewHandler
   );
 
-  server.put(
+  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().put(
     "/:id",
     {
+      preHandler: [server.authenticate],
       schema: {
         tags: ["New"],
         body: updateNewSchema,
