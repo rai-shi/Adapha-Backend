@@ -17,7 +17,7 @@ export default async function uploadRoutes(server: FastifyInstance) {
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().post(
     "/createImage",
     {
-      preHandler: [server.authenticate],
+      // preHandler: [server.authenticate],
       schema: {
         consumes: ["multipart/form-data"],
         tags: ["Upload"],

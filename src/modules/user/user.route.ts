@@ -15,6 +15,8 @@ import {
   createUserSchema,
   loginResponseSchema,
   loginSchema,
+  userQueryStringSchema,
+  usersResponseSchema,
 } from "./user.schema";
 
 async function userRoutes(server: FastifyInstance) {
@@ -53,6 +55,10 @@ async function userRoutes(server: FastifyInstance) {
       preHandler: [server.authenticate],
       schema: {
         tags: ["User"],
+        querystring: userQueryStringSchema,
+        response: {
+          200: usersResponseSchema,
+        },
       },
     },
     getUsersHandler

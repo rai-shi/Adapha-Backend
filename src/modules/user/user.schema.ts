@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { queryStringBaseSchema } from "../../utils/schema";
 
 export const userCore = {
   email: z
@@ -83,6 +84,22 @@ export const changePasswordSchema = z.object({
         message: "Password must contain at least one special character.",
       }
     ),
+});
+
+export const userQueryStringSchema = queryStringBaseSchema.extend({
+  email: z.string().optional().openapi({
+    description: "Email query",
+  }),
+});
+
+export const usersResponseSchema = z.object({
+  totalCount: z.number(),
+  data: z.array(
+    z.object({
+      id: z.number(),
+      email: z.string(),
+    })
+  ),
 });
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
