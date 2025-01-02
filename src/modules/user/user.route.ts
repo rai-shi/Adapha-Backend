@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { FastifyZodOpenApiTypeProvider } from "fastify-zod-openapi";
 import {
   changePasswordHandler,
+  deleteUserHandler,
   getUserHandler,
   getUsersHandler,
   loginHandler,
@@ -97,6 +98,17 @@ async function userRoutes(server: FastifyInstance) {
       },
     },
     changePasswordHandler
+  );
+
+  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().delete(
+    "/:id",
+    {
+      schema: {
+        preHandler: [server.authenticate],
+        tags: ["User"],
+      },
+    },
+    deleteUserHandler
   );
 }
 

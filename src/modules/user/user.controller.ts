@@ -1,4 +1,9 @@
 import { FastifyReply, FastifyRequest } from "fastify";
+import {
+  FilterOptions,
+  PaginationOptions,
+  SortingOptions,
+} from "../../utils/data.util";
 import { verifyPassword } from "../../utils/hash";
 import {
   ChangePasswordInput,
@@ -8,6 +13,7 @@ import {
 import {
   changePassword,
   createUser,
+  deleteUser,
   findUserByEmail,
   getUsers,
 } from "./user.service";
@@ -117,9 +123,15 @@ export async function refreshTokenHandler(
   }
 }
 
-export async function getUsersHandler() {
-  const users = await getUsers();
-  return users;
+export async function getUsersHandler(
+  request: FastifyRequest<{
+    Querystring: PaginationOptions & SortingOptions & FilterOptions;
+  }>,
+  reply: FastifyReply
+) {
+  const { totalCount, data } = await getUsers(request.query);
+
+  return reply.send({ totalCount, data });
 }
 
 export async function logoutHandler(
@@ -190,5 +202,29 @@ export async function changePasswordHandler(
       message: "Internal Server Error",
       error: error,
     });
+  }
+}
+
+export async function deleteUserHandler(
+  request: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply
+) {
+  const id = Number(request.params.id);
+
+  try {
+    await deleteUser(id);
+    return reply.send({ message: "User deleted successfully" });
+  } catch (error) {
+    const err = error as { message: string };
+
+    if (err.message === "NOT_FOUND") {
+      return reply.status(404).send({ message: "User not found" });
+    }
+
+    if (err.message === "LAST_USER") {
+      return reply.status(400).send({ message: "Cannot delete the last user" });
+    }
+
+    reply.status(500).send({ error: "Failed to delete user" });
   }
 }

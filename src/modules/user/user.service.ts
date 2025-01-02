@@ -1,3 +1,9 @@
+import {
+  FilterOptions,
+  manageData,
+  PaginationOptions,
+  SortingOptions,
+} from "../../utils/data.util";
 import { hashPassword, verifyPassword } from "../../utils/hash";
 import { db } from "../../utils/prisma";
 import { CreateUserInput } from "./user.schema";
@@ -22,13 +28,22 @@ export async function findUserByEmail(email: string) {
   });
 }
 
-export async function getUsers() {
-  return db.user.findMany({
-    select: {
-      id: true,
-      email: true,
-    },
-  });
+export async function getUsers(
+  query: PaginationOptions & SortingOptions & FilterOptions
+) {
+  try {
+    const users = await db.user.findMany({
+      select: {
+        id: true,
+        email: true,
+      },
+    });
+
+    const { totalCount, data: paginatedUsers } = manageData(users, query, true);
+    return { totalCount, data: paginatedUsers };
+  } catch (error) {
+    throw new Error("Failed to get users");
+  }
 }
 
 export async function changePassword(
@@ -65,4 +80,31 @@ export async function changePassword(
   });
 
   return { message: "Password changed successfully" };
+}
+
+export async function deleteUser(id: number) {
+  try {
+    const users = await db.user.findMany();
+
+    if (users.length === 1) {
+      throw new Error("LAST_USER");
+    }
+
+    const user = await db.user.delete({
+      where: {
+        id,
+      },
+    });
+    return user;
+  } catch (error) {
+    if ((error as { code: string }).code === "P2025") {
+      throw new Error("NOT_FOUND");
+    }
+
+    if ((error as { message: string }).message === "LAST_USER") {
+      throw new Error("LAST_USER");
+    }
+
+    throw new Error("Failed to delete user");
+  }
 }
