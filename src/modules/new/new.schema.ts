@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { queryStringBaseSchema } from "../../utils/schema";
 
 export const NewTranslationSchema = z.object({
   language: z
@@ -140,6 +141,25 @@ export const updateNewSchema = z.object({
         },
       ],
     }),
+});
+
+export const newQuerySchema = queryStringBaseSchema.extend({
+  "category.translations.title": z
+    .string()
+    .optional()
+    .openapi({ description: "The title of the category" }),
+  "translations.title": z
+    .string()
+    .optional()
+    .openapi({ description: "The title of the new" }),
+});
+
+export const newQuerySchemaByLanguage = queryStringBaseSchema.extend({
+  title: z.string().optional().openapi({ description: "The title of the new" }),
+  categoryName: z
+    .string()
+    .optional()
+    .openapi({ description: "The title of the category" }),
 });
 
 export const getAllFeaturedNewsResponseSchema = z.array(newsBaseSchema);

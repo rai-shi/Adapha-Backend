@@ -7,6 +7,7 @@ import {
   getContactsHandler,
 } from "./contact.controller";
 import {
+  contactQuerySchema,
   contactResponseSchema,
   contactSchema,
   contactsResponseSchema,
@@ -23,6 +24,7 @@ export default async function contactRoutes(server: FastifyInstance) {
         response: {
           200: contactsResponseSchema,
         },
+        querystring: contactQuerySchema
       },
     },
     getContactsHandler

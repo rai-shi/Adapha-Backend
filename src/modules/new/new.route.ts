@@ -27,6 +27,8 @@ import {
   getNewByLanguageResponseSchema,
   getNewsByIdResponseSchema,
   getNewsByLanguageSchema,
+  newQuerySchema,
+  newQuerySchemaByLanguage,
   updateNewSchema,
 } from "./new.schema";
 
@@ -39,6 +41,7 @@ export async function newRoutes(server: FastifyInstance) {
         response: {
           200: getAllNewsResponseSchema,
         },
+        querystring: newQuerySchema
       },
     },
     getAllNewsHandler
@@ -145,6 +148,7 @@ export async function englishNewRoutes(server: FastifyInstance) {
         response: {
           200: getNewsByLanguageSchema,
         },
+        querystring: newQuerySchemaByLanguage
       },
     },
     async (
@@ -217,6 +221,7 @@ export async function turkishNewRoutes(server: FastifyInstance) {
         response: {
           200: getNewsByLanguageSchema,
         },
+        querystring: newQuerySchemaByLanguage
       },
     },
     async (

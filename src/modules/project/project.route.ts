@@ -18,6 +18,8 @@ import {
 import {
   EditProjectSchema,
   ProjectParamsSchema,
+  projectQuerySchema,
+  projectQuerySchemaByLanguage,
   ProjectResponseSchema,
   ProjectsByLanguageSchema,
   ProjectSchema,
@@ -33,6 +35,7 @@ export default async function projectRoutes(server: FastifyInstance) {
         response: {
           200: ProjectsResponseSchema,
         },
+        querystring: projectQuerySchema,
       },
     },
     getProjectsHandler
@@ -105,6 +108,7 @@ export async function turkishProjectRoutes(server: FastifyInstance) {
         response: {
           200: ProjectsByLanguageSchema,
         },
+        querystring: projectQuerySchemaByLanguage,
       },
     },
     async (
@@ -129,6 +133,7 @@ export async function englishProjectRoutes(server: FastifyInstance) {
         response: {
           200: ProjectsByLanguageSchema,
         },
+        querystring: projectQuerySchemaByLanguage,
       },
     },
     async (

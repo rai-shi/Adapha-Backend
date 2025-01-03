@@ -5,6 +5,7 @@ import {
   PaginationOptions,
   SortingOptions,
 } from "../../utils/data.util";
+import { queryStringBaseSchema } from "../../utils/schema";
 import {
   createTeamMemberHandler,
   deleteTeamMemberHandler,
@@ -63,6 +64,7 @@ export async function teamRoutes(server: FastifyInstance) {
         response: {
           200: getAllTeamMembersResponseSchema,
         },
+        querystring: queryStringBaseSchema,
       },
     },
     getAllTeamMembersHandler
@@ -106,6 +108,7 @@ export async function turkishTeamRoutes(server: FastifyInstance) {
         response: {
           200: teamMembersByLanguageResponseSchema,
         },
+        querystring: queryStringBaseSchema,
       },
     },
     async (
@@ -130,6 +133,7 @@ export async function englishTeamRoutes(server: FastifyInstance) {
         response: {
           200: teamMembersByLanguageResponseSchema,
         },
+        querystring: queryStringBaseSchema,
       },
     },
     async (

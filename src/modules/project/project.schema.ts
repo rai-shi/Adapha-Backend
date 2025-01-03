@@ -2,6 +2,7 @@
 
 import * as z from "zod";
 import "zod-openapi/extend";
+import { queryStringBaseSchema } from "../../utils/schema";
 
 export const ProjectTranslationSchema = z.object({
   language: z
@@ -138,6 +139,18 @@ export const ProjectsByLanguageSchema = z.object({
       description: z.string(),
     })
   ),
+});
+
+export const projectQuerySchema = queryStringBaseSchema.extend({
+  "translations.title": z.string().optional().openapi({
+    description: "The title of the project",
+  }),
+});
+
+export const projectQuerySchemaByLanguage = queryStringBaseSchema.extend({
+  title: z.string().optional().openapi({
+    description: "The title of the project",
+  }),
 });
 
 export type ProjectInput = z.infer<typeof ProjectSchema>;

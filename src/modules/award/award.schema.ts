@@ -2,6 +2,7 @@
 
 import * as z from "zod";
 import "zod-openapi/extend";
+import { queryStringBaseSchema } from "../../utils/schema";
 
 export const AwardTranslationSchema = z.object({
   language: z
@@ -139,6 +140,18 @@ export const AwardsByLanguageSchema = z.object({
       description: z.string(),
     })
   ),
+});
+
+export const awardQuerySchema = queryStringBaseSchema.extend({
+  "translations.title": z.string().optional().openapi({
+    description: "The title of the award",
+  }),
+});
+
+export const awardQuerySchemaByLanguage = queryStringBaseSchema.extend({
+  title: z.string().optional().openapi({
+    description: "The title of the award",
+  }),
 });
 
 export type AwardInput = z.infer<typeof AwardSchema>;

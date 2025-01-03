@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { queryStringBaseSchema } from "../../utils/schema";
 
 export const NewCategoryTranslationSchema = z.object({
   language: z
@@ -44,7 +45,8 @@ export const getNewCategoriesByLanguageResponseSchema = z.object({
   ),
 });
 
-export const getAllNewCategoriesResponseSchema = z.object({
+export const getAllNewCategoriesResponseSchema = z
+  .object({
     totalCount: z.number().describe("Total number of contacts"),
     data: z
       .array(
@@ -98,6 +100,17 @@ export const editNewCategorySchema = z.object({
         { language: "en", title: "English Title", id: 0 },
       ],
     }),
+});
+
+export const newCategoryQuerySchema = queryStringBaseSchema.extend({
+  "translations.title": z
+    .string()
+    .optional()
+    .openapi({ description: "The title of the translation" }),
+});
+
+export const newCategoryQuerySchemaByLanguage = queryStringBaseSchema.extend({
+  title: z.string().optional().openapi({ description: "The title of the translation" }),
 });
 
 export type EditCategoryInput = z.infer<typeof editNewCategorySchema>;

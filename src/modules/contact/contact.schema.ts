@@ -1,5 +1,6 @@
 import * as z from "zod";
 import "zod-openapi/extend";
+import { queryStringBaseSchema } from "../../utils/schema";
 
 export const contactSchema = z
   .object({
@@ -69,6 +70,24 @@ export const paramsSchema = z.object({
     .openapi({
       description: "The contact ID",
     }),
+});
+
+export const contactQuerySchema = queryStringBaseSchema.extend({
+  email: z.string().optional().openapi({
+    description: "Filter contacts by email",
+  }),
+  name: z.string().optional().openapi({
+    description: "Filter contacts by name",
+  }),
+  surname: z.string().optional().openapi({
+    description: "Filter contacts by surname",
+  }),
+  phone: z.string().optional().openapi({
+    description: "Filter contacts by phone",
+  }),
+  createdAt: z.string().optional().openapi({
+    description: "Filter contacts by creation date",
+  }),
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;

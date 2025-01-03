@@ -22,6 +22,8 @@ import {
   getNewCategoriesByLanguageResponseSchema,
   getNewCategoryByIdAndLanguageResponseSchema,
   getNewCategoryByIdResponseSchema,
+  newCategoryQuerySchema,
+  newCategoryQuerySchemaByLanguage,
 } from "./new-category.schema";
 
 export async function newCategoryRoutes(server: FastifyInstance) {
@@ -33,6 +35,7 @@ export async function newCategoryRoutes(server: FastifyInstance) {
         response: {
           200: getAllNewCategoriesResponseSchema,
         },
+        querystring: newCategoryQuerySchema
       },
     },
     getAllNewCategoriesHandler
@@ -102,6 +105,7 @@ export async function englishNewCategoryRoutes(server: FastifyInstance) {
         response: {
           200: getNewCategoriesByLanguageResponseSchema,
         },
+        querystring: newCategoryQuerySchemaByLanguage
       },
     },
     async (
@@ -150,6 +154,7 @@ export async function turkishNewCategoryRoutes(server: FastifyInstance) {
         response: {
           200: getNewCategoriesByLanguageResponseSchema,
         },
+        querystring: newCategoryQuerySchemaByLanguage
       },
     },
     async (

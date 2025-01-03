@@ -17,6 +17,8 @@ import {
 } from "./award.controller";
 import {
   AwardParamsSchema,
+  awardQuerySchema,
+  awardQuerySchemaByLanguage,
   AwardResponseSchema,
   AwardsByLanguageSchema,
   AwardSchema,
@@ -33,6 +35,7 @@ export default async function awardRoutes(server: FastifyInstance) {
         response: {
           200: AwardsResponseSchema,
         },
+        querystring: awardQuerySchema,
       },
     },
     getAwardsHandler
@@ -105,6 +108,7 @@ export async function turkishAwardRoutes(server: FastifyInstance) {
         response: {
           200: AwardsByLanguageSchema,
         },
+        querystring: awardQuerySchemaByLanguage,
       },
     },
     async (
@@ -129,6 +133,7 @@ export async function englishAwardRoutes(server: FastifyInstance) {
         response: {
           200: AwardsByLanguageSchema,
         },
+        querystring: awardQuerySchemaByLanguage,
       },
     },
     async (
