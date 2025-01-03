@@ -14,7 +14,10 @@ import {
 } from "fastify-zod-openapi";
 import { ZodOpenApiVersion } from "zod-openapi";
 import "zod-openapi/extend";
-import awardRoutes, { englishAwardRoutes, turkishAwardRoutes } from "./modules/award/award.route";
+import awardRoutes, {
+  englishAwardRoutes,
+  turkishAwardRoutes,
+} from "./modules/award/award.route";
 import contactRoutes from "./modules/contact/contact.route";
 import {
   englishNewCategoryRoutes,
@@ -26,14 +29,19 @@ import {
   newRoutes,
   turkishNewRoutes,
 } from "./modules/new/new.route";
-import projectRoutes, { englishProjectRoutes, turkishProjectRoutes } from "./modules/project/project.route";
+import projectRoutes, {
+  englishProjectRoutes,
+  turkishProjectRoutes,
+} from "./modules/project/project.route";
 import {
   englishTeamRoutes,
   teamRoutes,
-  turkishTeamRoutes
+  turkishTeamRoutes,
 } from "./modules/team/team.route";
 import uploadRoutes from "./modules/upload/upload.route";
+import { logoutHandler } from "./modules/user/user.controller";
 import userRoutes from "./modules/user/user.route";
+import { getUserByEmail } from "./modules/user/user.service";
 
 export function buildServer() {
   const server = Fastify();
@@ -102,8 +110,19 @@ export function buildServer() {
 
       // Burada access token geçerli mi diye kontrol ediyoruz
       try {
-        const decoded = request.jwt.verify(accessToken);
+        const decoded = request.jwt.verify(accessToken) as {
+          email: string;
+          [key: string]: any;
+        };
         request.user = decoded;
+        const isUserLegit = await getUserByEmail(request.user.email);
+
+        if (!isUserLegit) {
+          await logoutHandler(request, reply);
+          return reply
+            .status(401)
+            .send({ message: "Unauthorized, user not found." });
+        }
       } catch (error) {
         // Access token süresi bittiyse
         if ((error as any).code === "FAST_JWT_EXPIRED") {
@@ -207,13 +226,13 @@ export function buildServer() {
   server.register(englishTeamRoutes, { prefix: "api/en/team" });
   server.register(turkishTeamRoutes, { prefix: "api/tr/team" });
 
-  server.register(awardRoutes, {prefix:"api/awards"});
-  server.register(englishAwardRoutes, {prefix:"api/en/awards"});
-  server.register(turkishAwardRoutes, {prefix:"api/tr/awards"});
+  server.register(awardRoutes, { prefix: "api/awards" });
+  server.register(englishAwardRoutes, { prefix: "api/en/awards" });
+  server.register(turkishAwardRoutes, { prefix: "api/tr/awards" });
 
-  server.register(projectRoutes, {prefix:"api/projects"});
-  server.register(englishProjectRoutes, {prefix:"api/en/projects"});
-  server.register(turkishProjectRoutes, {prefix:"api/tr/projects"});
+  server.register(projectRoutes, { prefix: "api/projects" });
+  server.register(englishProjectRoutes, { prefix: "api/en/projects" });
+  server.register(turkishProjectRoutes, { prefix: "api/tr/projects" });
 
   return server;
 }
