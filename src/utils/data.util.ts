@@ -138,13 +138,13 @@ export function manageData<T extends Record<string, any>>(
   const sortedData = filteredData.sort((a, b) => {
     if (typeof a[sortBy] === "string" && typeof b[sortBy] === "string") {
       if (a[sortBy].toLowerCase() < b[sortBy].toLowerCase())
-        return order === "asc" ? -1 : 1;
+        return order.toLowerCase() === "asc" ? -1 : 1;
       if (a[sortBy].toLowerCase() > b[sortBy].toLowerCase())
-        return order === "asc" ? 1 : -1;
+        return order.toLowerCase() === "asc" ? 1 : -1;
     }
 
-    if (a[sortBy] < b[sortBy]) return order === "asc" ? -1 : 1;
-    if (a[sortBy] > b[sortBy]) return order === "asc" ? 1 : -1;
+    if (a[sortBy] < b[sortBy]) return order.toLowerCase() === "asc" ? -1 : 1;
+    if (a[sortBy] > b[sortBy]) return order.toLowerCase() === "asc" ? 1 : -1;
     return 0;
   });
 

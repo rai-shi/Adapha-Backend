@@ -128,6 +128,14 @@ export async function getNewCategoryByIdAndLanguage(
 
 export async function deleteNewCategory(id: number) {
   try {
+    const relatedNews = await db.new.findMany({
+      where: { categoryId: id },
+    });
+
+    if (relatedNews.length > 0) {
+      throw new Error("CONNECTED_NEWS");
+    }
+
     await db.newCategoryTranslation.deleteMany({
       where: { categoryId: id },
     });
@@ -140,6 +148,10 @@ export async function deleteNewCategory(id: number) {
   } catch (error) {
     if ((error as { code: string }).code === "P2025") {
       throw new Error("NOT_FOUND");
+    }
+
+    if ((error as { message: string }).message === "CONNECTED_NEWS") {
+      throw new Error("CONNECTED_NEWS");
     }
 
     throw new Error("Failed to delete category and its translations");

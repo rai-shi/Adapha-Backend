@@ -123,6 +123,15 @@ export async function deleteNewCategoryHandler(
       return reply.status(404).send({ message: "New category not found" });
     }
 
+    if (err.message === "CONNECTED_NEWS") {
+      return reply
+        .status(400)
+        .send({
+          message:
+            "Before you delete this category you must delete related news",
+        });
+    }
+
     reply.status(500).send({ error: "Failed to delete new category" });
   }
 }

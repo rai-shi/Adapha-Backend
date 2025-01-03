@@ -31,8 +31,6 @@ export async function getAllTeamMembers(
 
 export async function createTeamMember(data: TeamMemberInput) {
   try {
-    console.log("Translations:", data.translations);
-
     const teamMember = await db.teamMember.create({
       data: {
         name: data.name, // Zorunlu alan
@@ -78,7 +76,6 @@ export async function deleteTeamMember(id: number) {
 
     return deletedNew;
   } catch (error) {
-    console.log(error);
     if ((error as { code: string }).code === "P2025") {
       throw new Error("NOT_FOUND");
     }

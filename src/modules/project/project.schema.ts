@@ -137,6 +137,7 @@ export const ProjectsByLanguageSchema = z.object({
       image: z.string(),
       title: z.string(),
       description: z.string(),
+      createdAt: z.date(),
     })
   ),
 });

@@ -72,6 +72,7 @@ import { EditProjectInput, ProjectInput } from "./project.schema";
         image: project.image,
         title: project.translations[0].title,
         description: project.translations[0].description,
+        createdAt: project.createdAt,
       }));
 
       const { totalCount, data: paginatedProjects } = manageData(

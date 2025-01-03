@@ -47,7 +47,7 @@ export const getAllTeamMembersResponseSchema = z
           image: z.string(),
           translations: z.array(
             TeamMemberTranslationSchema.extend({
-              title: z.string(),
+              title: z.string().optional().nullable(),
               role: z.string(),
               teamMemberId: z.number(),
             })
@@ -68,7 +68,7 @@ export const getTeamMemberByIdResponseSchema = z.object({
   translations: z.array(
     TeamMemberTranslationSchema.extend({
       id: z.number(),
-      title: z.string(),
+      title: z.string().nullable(),
       role: z.string(),
     })
   ),
@@ -120,7 +120,7 @@ export const teamMembersByLanguageResponseSchema = z.object({
       name: z.string(),
       surname: z.string(),
       image: z.string(),
-      title: z.string(),
+      title: z.string().optional().nullable(),
       role: z.string(),
     })
   ),
