@@ -160,6 +160,10 @@ export const newQuerySchemaByLanguage = queryStringBaseSchema.extend({
     .string()
     .optional()
     .openapi({ description: "The title of the category" }),
+  categoryId: z
+    .string()
+    .optional()
+    .openapi({ description: "The id of the category" }),
 });
 
 export const getAllFeaturedNewsResponseSchema = z.array(newsBaseSchema);
