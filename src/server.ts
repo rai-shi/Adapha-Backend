@@ -2,6 +2,7 @@ import fCookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import fjwt from "@fastify/jwt";
 import fastifyMultipart from "@fastify/multipart";
+import fastifyStatic from "@fastify/static";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
@@ -12,6 +13,8 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-zod-openapi";
+import fs from "fs";
+import path from "path";
 import { ZodOpenApiVersion } from "zod-openapi";
 import "zod-openapi/extend";
 import awardRoutes, {
@@ -45,6 +48,24 @@ import { getUserByEmail } from "./modules/user/user.service";
 
 export function buildServer() {
   const server = Fastify();
+
+  const UPLOADS_DIR = path.resolve(__dirname, "../uploads");
+
+  server.register(fastifyStatic, {
+    root: UPLOADS_DIR,
+    prefix: "/uploads/",
+  });
+
+  server.get("/api/images/:filename", async (request, reply) => {
+    const { filename } = request.params as { filename: string };
+    const filePath = path.join(UPLOADS_DIR, filename);
+
+    if (!fs.existsSync(filePath)) {
+      return reply.status(404).send({ error: "File not found" });
+    }
+
+    return reply.type("image/webp").send(fs.createReadStream(filePath));
+  });
 
   server.register(cors, {
     origin: [

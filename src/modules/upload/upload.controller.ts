@@ -48,7 +48,7 @@ export async function uploadImageHandler<T>(images: T) {
       const filePath = resolve(uploadDir, outputFilename);
       fileUrls.push(outputFilename);
 
-      await sharp(value).webp({ quality: 80 }).toFile(filePath);
+      await sharp(value).webp({ quality: 70 }).toFile(filePath);
     }
 
     return {

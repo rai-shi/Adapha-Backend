@@ -1,18 +1,18 @@
 import { FastifyInstance } from "fastify";
 import { FastifyZodOpenApiTypeProvider } from "fastify-zod-openapi";
 import * as z from "zod";
-import { getImageHandler, postImageHandler } from "./upload.controller";
+import { postImageHandler } from "./upload.controller";
 
 export default async function uploadRoutes(server: FastifyInstance) {
-  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
-    "/:filename",
-    {
-      schema: {
-        tags: ["Upload"],
-      },
-    },
-    getImageHandler
-  );
+  // server.withTypeProvider<FastifdyZodOpenApiTypeProvider>().get(
+  //   "/:filename",
+  //   {
+  //     schema: {
+  //       tags: ["Upload"],
+  //     },
+  //   },
+  //   getImageHandler
+  // );
 
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().post(
     "/createImage",
