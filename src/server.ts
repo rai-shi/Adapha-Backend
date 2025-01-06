@@ -48,9 +48,8 @@ export function buildServer() {
 
   server.register(cors, {
     origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://fkk044gs0owogw48sgw8scs8.159.69.179.28.sslip.io",
+      "https://adaphapanel.emirsahinkaratas.com.tr",
+      "https://adapha.emirsahinkaratas.com.tr",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
