@@ -47,7 +47,11 @@ export function buildServer() {
   const server = Fastify();
 
   server.register(cors, {
-    origin: "*",
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://fkk044gs0owogw48sgw8scs8.159.69.179.28.sslip.io",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
