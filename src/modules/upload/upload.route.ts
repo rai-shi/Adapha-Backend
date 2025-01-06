@@ -4,16 +4,6 @@ import * as z from "zod";
 import { postImageHandler } from "./upload.controller";
 
 export default async function uploadRoutes(server: FastifyInstance) {
-  // server.withTypeProvider<FastifdyZodOpenApiTypeProvider>().get(
-  //   "/:filename",
-  //   {
-  //     schema: {
-  //       tags: ["Upload"],
-  //     },
-  //   },
-  //   getImageHandler
-  // );
-
   server.withTypeProvider<FastifyZodOpenApiTypeProvider>().post(
     "/createImage",
     {
