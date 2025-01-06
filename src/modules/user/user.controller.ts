@@ -85,7 +85,7 @@ export async function loginHandler(
     path: "/",
     maxAge: 24 * 60 * 60 * 1000 * (body.rememberMe ? 30 : 1),
     httpOnly: true,
-    secure: true,
+    // secure: true,
   });
 
   return { accessToken, email: user.email };
