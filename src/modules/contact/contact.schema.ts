@@ -34,6 +34,7 @@ export const contactSchema = z
         invalid_type_error: "Message must be a string",
       })
       .min(1, { message: "Message cannot be empty" }),
+    video: z.string().nullable().optional(),
   })
   .openapi({
     description: "Contact information",
@@ -42,6 +43,7 @@ export const contactSchema = z
 export const contactResponseSchema = z
   .object({
     id: z.number().describe("The contact ID"),
+    video: z.string().optional().describe("The video URL"),
   })
   .merge(contactSchema)
   .extend({

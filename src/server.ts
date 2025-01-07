@@ -67,10 +67,49 @@ export function buildServer() {
     return reply.type("image/webp").send(fs.createReadStream(filePath));
   });
 
+  server.get(
+    "/api/videos/:filename",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { filename } = request.params as { filename: string };
+      const filePath = path.join(UPLOADS_DIR, "videos", filename);
+
+      if (!fs.existsSync(filePath)) {
+        return reply.status(404).send({ error: "Video not found" });
+      }
+
+      const stat = fs.statSync(filePath);
+      const fileSize = stat.size;
+      const range = request.headers.range;
+
+      if (range) {
+        const parts = range.replace(/bytes=/, "").split("-");
+        const start = parseInt(parts[0], 10);
+        const end = parts[1]
+          ? parseInt(parts[1], 10)
+          : Math.min(start + 1000000, fileSize - 1);
+
+        const chunkSize = end - start + 1;
+        const fileStream = fs.createReadStream(filePath, { start, end });
+
+        return reply
+          .status(206)
+          .header("Content-Range", `bytes ${start}-${end}/${fileSize}`)
+          .header("Accept-Ranges", "bytes")
+          .header("Content-Length", chunkSize)
+          .header("Content-Type", "video/mp4")
+          .send(fileStream);
+      } else {
+        return reply.type("video/mp4").send(fs.createReadStream(filePath));
+      }
+    }
+  );
+
   server.register(cors, {
     origin: [
       "https://adaphapanel.emirsahinkaratas.com.tr",
       "https://adapha.emirsahinkaratas.com.tr",
+      "http://localhost:5173",
+      "http://localhost:3000",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -102,7 +141,7 @@ export function buildServer() {
     attachFieldsToBody: "keyValues",
     onFile,
     limits: {
-      fileSize: 4 * 1024 * 1024,
+      fileSize: 8 * 1024 * 1024,
     },
   });
 

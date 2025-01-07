@@ -4,6 +4,7 @@ import {
   PaginationOptions,
   SortingOptions,
 } from "../../utils/data.util";
+import { deleteVideo } from "../../utils/image";
 import { db } from "../../utils/prisma";
 import { ContactInput } from "./contact.schema";
 
@@ -15,6 +16,7 @@ export async function createContact(data: ContactInput) {
         createdAt: new Date(),
       },
     });
+
     return newContact;
   } catch (error) {
     throw new Error("Failed to create contact");
@@ -57,6 +59,9 @@ export async function deleteContact(id: number) {
         id,
       },
     });
+
+    if (contact.video) deleteVideo(contact.video);
+
     return contact;
   } catch (error) {
     if ((error as { code: string }).code === "P2025") {

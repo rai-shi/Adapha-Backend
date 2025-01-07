@@ -9,3 +9,12 @@ export function deleteImage(filename: string) {
     }
   });
 }
+
+export function deleteVideo(filename: string) {
+  const filePath = path.resolve("uploads/videos", filename);
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      throw new Error("Failed to delete video");
+    }
+  });
+}
