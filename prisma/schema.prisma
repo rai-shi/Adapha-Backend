@@ -121,3 +121,21 @@ model TeamMemberTranslation {
 
   @@unique([teamMemberId, language])
 }
+
+model IntroductionVideo {
+  id          Int                     @id @default(autoincrement())
+  image       String
+  url         String
+  createdAt   DateTime                @default(now())
+  translations IntroductionVideoTranslation[]
+}
+
+model IntroductionVideoTranslation {
+  id          Int    @id @default(autoincrement())
+  language    String
+  title       String
+  videoId     Int
+  video       IntroductionVideo @relation(fields: [videoId], references: [id])
+
+  @@unique([videoId, language])
+}

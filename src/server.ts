@@ -19,6 +19,7 @@ import awardRoutes, {
   turkishAwardRoutes,
 } from "./modules/award/award.route";
 import contactRoutes from "./modules/contact/contact.route";
+import introductionVideoRoutes, { englishIntroductionVideoRoutes, turkishIntroductionVideoRoutes } from "./modules/introduction-video/introduction-video.route";
 import {
   englishNewCategoryRoutes,
   newCategoryRoutes,
@@ -239,6 +240,16 @@ export function buildServer() {
   server.register(projectRoutes, { prefix: "api/projects" });
   server.register(englishProjectRoutes, { prefix: "api/en/projects" });
   server.register(turkishProjectRoutes, { prefix: "api/tr/projects" });
+
+  server.register(introductionVideoRoutes, {
+    prefix: "api/introduction-videos",
+  });
+  server.register(englishIntroductionVideoRoutes, {
+    prefix: "api/en/introduction-videos",
+  });
+  server.register(turkishIntroductionVideoRoutes, {
+    prefix: "api/tr/introduction-videos",
+  });
 
   return server;
 }
