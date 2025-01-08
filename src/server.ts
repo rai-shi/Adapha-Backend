@@ -2,7 +2,6 @@ import fCookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import fjwt from "@fastify/jwt";
 import fastifyMultipart from "@fastify/multipart";
-import fastifyStatic from "@fastify/static";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
@@ -13,8 +12,6 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-zod-openapi";
-import fs from "fs";
-import path from "path";
 import { ZodOpenApiVersion } from "zod-openapi";
 import "zod-openapi/extend";
 import awardRoutes, {
@@ -49,65 +46,11 @@ import { getUserByEmail } from "./modules/user/user.service";
 export function buildServer() {
   const server = Fastify();
 
-  const UPLOADS_DIR = path.resolve(__dirname, "../uploads");
-
-  server.register(fastifyStatic, {
-    root: UPLOADS_DIR,
-    prefix: "/uploads/",
-  });
-
-  server.get("/api/images/:filename", async (request, reply) => {
-    const { filename } = request.params as { filename: string };
-    const filePath = path.join(UPLOADS_DIR, filename);
-
-    if (!fs.existsSync(filePath)) {
-      return reply.status(404).send({ error: "File not found" });
-    }
-
-    return reply.type("image/webp").send(fs.createReadStream(filePath));
-  });
-
-  server.get(
-    "/api/videos/:filename",
-    async (request: FastifyRequest, reply: FastifyReply) => {
-      const { filename } = request.params as { filename: string };
-      const filePath = path.join(UPLOADS_DIR, "videos", filename);
-
-      if (!fs.existsSync(filePath)) {
-        return reply.status(404).send({ error: "Video not found" });
-      }
-
-      const stat = fs.statSync(filePath);
-      const fileSize = stat.size;
-      const range = request.headers.range;
-
-      if (range) {
-        const parts = range.replace(/bytes=/, "").split("-");
-        const start = parseInt(parts[0], 10);
-        const end = parts[1]
-          ? parseInt(parts[1], 10)
-          : Math.min(start + 1000000, fileSize - 1);
-
-        const chunkSize = end - start + 1;
-        const fileStream = fs.createReadStream(filePath, { start, end });
-
-        return reply
-          .status(206)
-          .header("Content-Range", `bytes ${start}-${end}/${fileSize}`)
-          .header("Accept-Ranges", "bytes")
-          .header("Content-Length", chunkSize)
-          .header("Content-Type", "video/mp4")
-          .send(fileStream);
-      } else {
-        return reply.type("video/mp4").send(fs.createReadStream(filePath));
-      }
-    }
-  );
-
   server.register(cors, {
     origin: [
       "https://adaphapanel.emirsahinkaratas.com.tr",
       "https://adapha.emirsahinkaratas.com.tr",
+      "https://emirsahinkaratas.com.tr",
       "http://localhost:5173",
       "http://localhost:3000",
     ],
@@ -141,7 +84,7 @@ export function buildServer() {
     attachFieldsToBody: "keyValues",
     onFile,
     limits: {
-      fileSize: 8 * 1024 * 1024,
+      fileSize: 20 * 1024 * 1024,
     },
   });
 

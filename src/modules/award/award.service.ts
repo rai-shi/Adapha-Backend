@@ -6,6 +6,7 @@ import {
   PaginationOptions,
   SortingOptions,
 } from "../../utils/data.util";
+import { deleteFromS3 } from "../../utils/image";
 import { db } from "../../utils/prisma";
 import { AwardInput, EditAwardInput } from "./award.schema";
 
@@ -138,6 +139,8 @@ export async function deleteAward(id: number) {
     const award = await db.award.delete({
       where: { id },
     });
+
+    await deleteFromS3(award.image);
 
     return award;
   } catch (error) {

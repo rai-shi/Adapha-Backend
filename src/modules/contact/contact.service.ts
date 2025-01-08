@@ -4,7 +4,7 @@ import {
   PaginationOptions,
   SortingOptions,
 } from "../../utils/data.util";
-import { deleteVideo } from "../../utils/image";
+import { deleteFromS3 } from "../../utils/image";
 import { db } from "../../utils/prisma";
 import { ContactInput } from "./contact.schema";
 
@@ -60,7 +60,7 @@ export async function deleteContact(id: number) {
       },
     });
 
-    if (contact.video) deleteVideo(contact.video);
+    if (contact.video) deleteFromS3(contact.video);
 
     return contact;
   } catch (error) {

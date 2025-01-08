@@ -4,6 +4,7 @@ import {
   PaginationOptions,
   SortingOptions,
 } from "../../utils/data.util";
+import { deleteFromS3 } from "../../utils/image";
 import { db } from "../../utils/prisma";
 import { NewInput, UpdateNewInput } from "./new.schema";
 
@@ -276,6 +277,8 @@ export async function deleteNew(id: number) {
     const deletedNew = await db.new.delete({
       where: { id },
     });
+
+    await deleteFromS3(deletedNew.image);
 
     return deletedNew;
   } catch (error) {

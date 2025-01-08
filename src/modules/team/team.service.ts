@@ -4,6 +4,7 @@ import {
   PaginationOptions,
   SortingOptions,
 } from "../../utils/data.util";
+import { deleteFromS3 } from "../../utils/image";
 import { db } from "../../utils/prisma";
 import { EditTeamMemberInput, TeamMemberInput } from "./team.schema";
 
@@ -73,6 +74,8 @@ export async function deleteTeamMember(id: number) {
     const deletedNew = await db.teamMember.delete({
       where: { id },
     });
+
+    await deleteFromS3(deletedNew.image);
 
     return deletedNew;
   } catch (error) {

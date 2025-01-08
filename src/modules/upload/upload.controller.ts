@@ -1,6 +1,6 @@
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import crypto from "crypto";
 import { FastifyReply, FastifyRequest } from "fastify";
-import fs from "fs";
-import { resolve } from "path";
 
 interface File {
   value: Buffer;
@@ -8,18 +8,44 @@ interface File {
   mimetype: string;
 }
 
-const IMAGE_MAX_SIZE = 4 * 1024 * 1024;
-const VIDEO_MAX_SIZE = 8 * 1024 * 1024;
+const bucketName = process.env.AWS_BUCKET_NAME;
+const region = process.env.AWS_BUCKET_REGION;
+const accessKeyId = process.env.AWS_ACCESS_KEY as string;
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY as string;
+
+const s3 = new S3Client({
+  credentials: {
+    accessKeyId: accessKeyId,
+    secretAccessKey: secretAccessKey,
+  },
+  region: region,
+});
+
+export async function uploadToS3(
+  file: Buffer,
+  filename: string,
+  mimeType: string
+) {
+  const params = {
+    Bucket: bucketName,
+    Key: filename,
+    Body: file,
+    ContentType: mimeType,
+  };
+
+  try {
+    const command = new PutObjectCommand(params);
+    await s3.send(command);
+    return filename;
+  } catch (error) {
+    throw new Error("Error uploading to S3");
+  }
+}
 
 export async function uploadImageHandler<T>(images: T) {
-  const uploadDir = resolve(__dirname, "../../../uploads");
   const flatImages = Array.isArray(images) ? images.flat() : [images];
 
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-
-  const fileUrls: string[] = [];
+  const files: string[] = [];
   const validImageTypes = [
     "image/jpeg",
     "image/jpg",
@@ -32,33 +58,27 @@ export async function uploadImageHandler<T>(images: T) {
     for (const file of flatImages) {
       const { value, filename, mimetype } = file as File;
 
-      if (value.length > IMAGE_MAX_SIZE) {
-        return {
-          message: "Total image size exceeds the limit (4 MB)",
-        };
-      }
-
       if (!validImageTypes.includes(mimetype)) {
         return {
           message: "Invalid file type",
         };
       }
 
-      const sanitizedFilename = filename
-        .replace(/\s+/g, "_")
-        .replace(/[^a-zA-Z0-9_.-]/g, "");
+      if (value.length > 4 * 1024 * 1024) {
+        return {
+          message: "Total image size exceeds the limit (4 MB)",
+        };
+      }
 
-      const outputFilename = `${Date.now()}-${sanitizedFilename}`;
-      const filePath = resolve(uploadDir, outputFilename);
-      fileUrls.push(outputFilename);
-
-      fs.writeFileSync(filePath, value);
+      const randomImageName = crypto.randomBytes(32).toString("hex");
+      const fileResult = await uploadToS3(value, randomImageName, mimetype);
+      files.push(fileResult);
     }
 
     return {
       message: "File uploaded successfully",
       data: {
-        url: fileUrls,
+        files: files,
       },
     };
   } catch (error) {
@@ -85,31 +105,14 @@ export async function postImageHandler(
 }
 
 export async function uploadVideoHandler<T>(videos: T) {
-  const uploadDir = resolve(__dirname, "../../../uploads/videos");
   const flatVideos = Array.isArray(videos) ? videos.flat() : [videos];
 
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-
-  const fileUrls: string[] = [];
-  const validVideoTypes = [
-    "video/mp4",
-    "video/avi",
-    "video/mov",
-    "video/mkv",
-    "video/webm",
-  ];
+  const files: string[] = [];
+  const validVideoTypes = ["video/mp4", "video/avi", "video/mov", "video/mkv"];
 
   try {
     for (const file of flatVideos) {
-      const { value, filename, mimetype } = file as File;
-
-      if (value.length > VIDEO_MAX_SIZE) {
-        return {
-          message: "Total video size exceeds the limit (8 MB)",
-        };
-      }
+      const { value, mimetype } = file as File;
 
       if (!validVideoTypes.includes(mimetype)) {
         return {
@@ -117,21 +120,21 @@ export async function uploadVideoHandler<T>(videos: T) {
         };
       }
 
-      const sanitizedFilename = filename
-        .replace(/\s+/g, "_")
-        .replace(/[^a-zA-Z0-9_.-]/g, "");
+      if (value.length > 20 * 1024 * 1024) {
+        return {
+          message: "Total video size exceeds the limit (20 MB)",
+        };
+      }
 
-      const outputFilename = `${Date.now()}-${sanitizedFilename}`;
-      const filePath = resolve(uploadDir, outputFilename);
-      fileUrls.push(outputFilename);
-
-      fs.writeFileSync(filePath, value);
+      const randomVideoName = crypto.randomBytes(32).toString("hex");
+      const fileResult = await uploadToS3(value, randomVideoName, mimetype);
+      files.push(fileResult);
     }
 
     return {
-      message: "Video uploaded successfully",
+      message: "File uploaded successfully",
       data: {
-        url: fileUrls,
+        files: files,
       },
     };
   } catch (error) {
