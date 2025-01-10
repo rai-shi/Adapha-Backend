@@ -15,6 +15,7 @@ import {
   getNewByIdAndLanguageHandler,
   getNewByIdHandler,
   getNewByLanguageHandler,
+  getRelatedNewsHandler,
   updateFeaturedNewHandler,
   updateNewHandler,
 } from "./new.controller";
@@ -41,7 +42,7 @@ export async function newRoutes(server: FastifyInstance) {
         response: {
           200: getAllNewsResponseSchema,
         },
-        querystring: newQuerySchema
+        querystring: newQuerySchema,
       },
     },
     getAllNewsHandler
@@ -148,7 +149,7 @@ export async function englishNewRoutes(server: FastifyInstance) {
         response: {
           200: getNewsByLanguageSchema,
         },
-        querystring: newQuerySchemaByLanguage
+        querystring: newQuerySchemaByLanguage,
       },
     },
     async (
@@ -210,6 +211,27 @@ export async function englishNewRoutes(server: FastifyInstance) {
       return getAllFeaturedNewsByLanguageHandler(req, reply);
     }
   );
+
+  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
+    "/:id/related",
+    {
+      schema: {
+        tags: ["New"],
+      },
+    },
+    async (
+      request: FastifyRequest<{
+        Params: { id: string; language: "en" | "tr" };
+      }>,
+      reply
+    ) => {
+      const req = {
+        ...request,
+        params: { ...request.params, language: "en" as "en" | "tr" },
+      };
+      return getRelatedNewsHandler(req, reply);
+    }
+  );
 }
 
 export async function turkishNewRoutes(server: FastifyInstance) {
@@ -221,7 +243,7 @@ export async function turkishNewRoutes(server: FastifyInstance) {
         response: {
           200: getNewsByLanguageSchema,
         },
-        querystring: newQuerySchemaByLanguage
+        querystring: newQuerySchemaByLanguage,
       },
     },
     async (
@@ -281,6 +303,27 @@ export async function turkishNewRoutes(server: FastifyInstance) {
         params: { ...request.params, language: "tr" as "en" | "tr" },
       };
       return getAllFeaturedNewsByLanguageHandler(req, reply);
+    }
+  );
+
+  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
+    "/:id/related",
+    {
+      schema: {
+        tags: ["New"],
+      },
+    },
+    async (
+      request: FastifyRequest<{
+        Params: { id: string; language: "en" | "tr" };
+      }>,
+      reply
+    ) => {
+      const req = {
+        ...request,
+        params: { ...request.params, language: "tr" as "en" | "tr", },
+      };
+      return getRelatedNewsHandler(req, reply);
     }
   );
 }

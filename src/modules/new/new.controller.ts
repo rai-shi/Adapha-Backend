@@ -15,6 +15,7 @@ import {
   getAllNonFeaturedNews,
   getNewById,
   getNewByIdAndLanguage,
+  getRelatedNews,
   updateFeaturedNew,
   updateNew,
 } from "./new.service";
@@ -261,5 +262,24 @@ export async function updateFeaturedNewHandler(
       message: "Internal Server Error",
       error: error,
     });
+  }
+}
+
+export async function getRelatedNewsHandler(
+  request: FastifyRequest<{
+    Params: {
+      id: string;
+      language: "en" | "tr";
+    };
+  }>,
+  reply: FastifyReply
+) {
+  const { id, language } = request.params;
+
+  try {
+    const data = await getRelatedNews(Number(id), language, 3);
+    return reply.send(data);
+  } catch (error) {
+    reply.status(500).send({ error: `Failed to fetch news for ${language}` });
   }
 }

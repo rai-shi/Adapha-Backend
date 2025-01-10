@@ -387,3 +387,33 @@ export async function updateFeaturedNew(id: number) {
     throw new Error("Failed to update new");
   }
 }
+
+export async function getRelatedNews(
+  id: number,
+  language: "en" | "tr",
+  count: number
+) {
+  const news = await db.new.findMany({
+    where: { NOT: { id } },
+    take: count,
+    include: {
+      translations: { where: { language } },
+      category: { include: { translations: { where: { language } } } },
+    },
+  });
+
+  const dataResult = news.map((item) => {
+    const { translations, category, ...rest } = item;
+    return {
+      ...rest,
+      language: translations[0].language,
+      title: translations[0].title,
+      content: translations[0].content,
+      description: translations[0].description,
+      slug: translations[0].slug,
+      categoryName: category?.translations[0]?.title,
+    };
+  });
+
+  return dataResult;
+}
