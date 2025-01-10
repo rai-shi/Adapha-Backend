@@ -10,6 +10,7 @@ import {
   deleteNewHandler,
   getAllFeaturedNewsByLanguageHandler,
   getAllFeaturedNewsHandler,
+  getAllNewsByLanguageHandler,
   getAllNewsHandler,
   getAllNonFeaturedNewsHandler,
   getNewByIdAndLanguageHandler,
@@ -232,6 +233,24 @@ export async function englishNewRoutes(server: FastifyInstance) {
       return getRelatedNewsHandler(req, reply);
     }
   );
+
+  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
+    "/all",
+    {
+      schema: {
+        tags: ["New"],
+      },
+    },
+    async (
+      request: FastifyRequest<{
+        Params: { language: "en" | "tr" };
+      }>,
+      reply
+    ) => {
+      const req = { ...request, params: { language: "en" as "en" | "tr" } };
+      return getAllNewsByLanguageHandler(req, reply);
+    }
+  );
 }
 
 export async function turkishNewRoutes(server: FastifyInstance) {
@@ -321,9 +340,27 @@ export async function turkishNewRoutes(server: FastifyInstance) {
     ) => {
       const req = {
         ...request,
-        params: { ...request.params, language: "tr" as "en" | "tr", },
+        params: { ...request.params, language: "tr" as "en" | "tr" },
       };
       return getRelatedNewsHandler(req, reply);
+    }
+  );
+
+  server.withTypeProvider<FastifyZodOpenApiTypeProvider>().get(
+    "/all",
+    {
+      schema: {
+        tags: ["New"],
+      },
+    },
+    async (
+      request: FastifyRequest<{
+        Params: { language: "en" | "tr" };
+      }>,
+      reply
+    ) => {
+      const req = { ...request, params: { language: "tr" as "en" | "tr" } };
+      return getAllNewsByLanguageHandler(req, reply);
     }
   );
 }

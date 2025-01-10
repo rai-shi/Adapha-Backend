@@ -417,3 +417,42 @@ export async function getRelatedNews(
 
   return dataResult;
 }
+
+export async function getAllNewsPlainByLanguage(language: "en" | "tr") {
+  try {
+    const news = await db.new.findMany({
+      include: {
+        translations: {
+          where: { language },
+        },
+        category: {
+          include: {
+            translations: {
+              where: { language },
+            },
+          },
+        },
+      },
+    });
+
+    const dataResult = news.map((news) => {
+      const { translations, category, ...rest } = news;
+
+      const result = {
+        ...rest,
+        language: translations[0].language,
+        title: translations[0].title,
+        content: translations[0].content,
+        description: translations[0].description,
+        slug: translations[0].slug,
+        categoryName: category?.translations[0]?.title,
+      };
+
+      return result;
+    });
+
+    return dataResult;
+  } catch (error) {
+    throw new Error("Failed to fetch news");
+  }
+}

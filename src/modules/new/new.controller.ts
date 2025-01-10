@@ -12,6 +12,7 @@ import {
   getAllFeaturedNewsByLanguage,
   getAllNews,
   getAllNewsByLangauge,
+  getAllNewsPlainByLanguage,
   getAllNonFeaturedNews,
   getNewById,
   getNewByIdAndLanguage,
@@ -281,5 +282,23 @@ export async function getRelatedNewsHandler(
     return reply.send(data);
   } catch (error) {
     reply.status(500).send({ error: `Failed to fetch news for ${language}` });
+  }
+}
+
+export async function getAllNewsByLanguageHandler(
+  request: FastifyRequest<{
+    Params: { language: "en" | "tr" };
+  }>,
+  reply: FastifyReply
+) {
+  const { language } = request.params;
+
+  try {
+    const data = await getAllNewsPlainByLanguage(language);
+    return reply.send(data);
+  } catch (error) {
+    reply
+      .status(500)
+      .send({ error: `Failed to fetch categories for ${language}` });
   }
 }
