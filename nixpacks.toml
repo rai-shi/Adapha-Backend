@@ -1,6 +1,18 @@
-[phases.install]
-cmd = "npm install --omit=dev && npx prisma generate && npx prisma migrate dev"  
+# Nixpacks production configuration file
 
+[phases]
+  [phases.setup]
+  # Node.js environment setup
+  cmd = "npm install --omit=dev"
 
-[start]
-cmd = "npm run dev" 
+  [phases.install]
+  # Install production dependencies and Prisma commands
+  cmd = "npm ci && npx prisma generate && npx prisma migrate deploy"
+
+  [phases.build]
+  # No build step is necessary for this project; adjust if needed
+  cmd = "echo 'No build step required'"
+
+  [phases.start]
+  # Start the server with a production-friendly command
+  cmd = "node dist/app.js"
