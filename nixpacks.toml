@@ -2,4 +2,4 @@
 nixPkgs = ['nodejs']
 
 [start]
-cmd = "node app/server.js" 
+cmd = "tsc && node dist/server.js"
