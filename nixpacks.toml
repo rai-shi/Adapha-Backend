@@ -1,5 +1,8 @@
 [phases.setup]
-nixPkgs = ['nodejs']
+nixPkgs = ["nodejs", "npm"]  
+
+[phases.install]
+cmd = "npm install && npx prisma generate && npx prisma migrate dev"  
 
 [start]
-cmd = "tsc && node dist/server.js"
+cmd = "npm run dev" 
