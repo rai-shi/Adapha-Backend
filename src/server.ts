@@ -51,7 +51,7 @@ export function buildServer() {
   //  "https://emirsahinkaratas.com.tr",
   server.register(cors, {
     origin: [
-      "https://adapha.adapha.com",
+      "https://api.adapha.com",
       "https://panel.adapha.com",
       "https://adapha.com",
       "http://localhost:5173",
