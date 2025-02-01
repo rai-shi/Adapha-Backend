@@ -1,5 +1,6 @@
 [phases.install]
-cmd = "npm install && npx prisma generate && npx prisma migrate dev"  
+cmd = "npm install --omit=dev && npx prisma generate && npx prisma migrate dev"  
+
 
 [start]
 cmd = "npm run dev" 
