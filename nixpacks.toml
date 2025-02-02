@@ -1,5 +1,5 @@
 [phases.install]
-cmd = "npm install && npx prisma generate && npx prisma migrate dev"  
+cmd = "npm install && npx prisma generate && npx prisma migrate deploy"
 
 [start]
-cmd = "tsx watch src/app.ts"
+cmd = "sleep 5 && tsx src/app.ts"
