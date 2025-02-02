@@ -46,9 +46,9 @@ import { getUserByEmail } from "./modules/user/user.service";
 
 export function buildServer() {
   const server = Fastify();
-  //"https://adaphapanel.emirsahinkaratas.com.tr",
-  //    "https://adapha.emirsahinkaratas.com.tr",
-  //  "https://emirsahinkaratas.com.tr",
+  // "https://adaphapanel.emirsahinkaratas.com.tr",
+  // "https://adapha.emirsahinkaratas.com.tr",
+  // "https://emirsahinkaratas.com.tr",
   server.register(cors, {
     origin: [
       "https://api.adapha.com",

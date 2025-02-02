@@ -1,2 +1,0 @@
-[start]
-cmd = "sleep 5 && tsx src/server.ts"
