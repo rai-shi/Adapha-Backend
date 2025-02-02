@@ -49,6 +49,11 @@ export function buildServer() {
   // "https://adaphapanel.emirsahinkaratas.com.tr",
   // "https://adapha.emirsahinkaratas.com.tr",
   // "https://emirsahinkaratas.com.tr",
+  server.get("/health", {
+    handler: async (request, reply) => {
+      return reply.code(200).send({ status: "ok" });
+    },
+  });
   server.register(cors, {
     origin: [
       "https://api.adapha.com",
